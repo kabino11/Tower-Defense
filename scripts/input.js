@@ -86,7 +86,13 @@ Game.input = (function() {
 
 		that.getCanvasBounds = function() {
 			return canvas.getBoundingClientRect();
-		}
+		};
+
+		that.inCanvas = function() {
+			var canvasRect = canvas.getBoundingClientRect();
+
+			return lastPosition.x >= 0 && lastPosition.x <= canvasRect.width && lastPosition.y >= 0 && lastPosition.y <= canvasRect.height;
+		};
 
 		return that;
 	}

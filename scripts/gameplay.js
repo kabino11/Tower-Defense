@@ -223,7 +223,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		// determines if mouse is in the canvas and if the proposed position is in a valid location
 		// if so then place the tower
-		if(towerUnderMouse == undefined && validPlace && mousePos.x >= 0 && mousePos.x <= canvasRect.width && mousePos.y >= 0 && mousePos.y <= canvasRect.height) {
+		if(towerUnderMouse == undefined && validPlace && mouse.inCanvas()) {
 			// calculate 2d array coordinates
 			var xLoc = Math.floor(mousePos.x / (canvasRect.width / cols));
 			var yLoc = Math.floor(mousePos.y / (canvasRect.height / rows));
@@ -305,7 +305,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		var mousePos = mouse.getMouse();
 
 		// if the mouse is in the canvas
-		if(mousePos.x >= 0 && mousePos.x <= canvasRect.width && mousePos.y >= 0 && mousePos.y <= canvasRect.height) {
+		if(mouse.inCanvas()) {
 			// calculate grid coordinates for current mouse position
 			var xDist = canvasRect.width / cols;
 			var yDist = canvasRect.height / rows;
@@ -387,7 +387,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			var canvasRect = mouse.getCanvasBounds();
 			var mousePos = mouse.getMouse();
 
-			if(mousePos.x >= 0 && mousePos.x <= canvasRect.width && mousePos.y >= 0 && mousePos.y <= canvasRect.height) {
+			if(mouse.inCanvas()) {
 				graphics.highlightRange({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, r:rangeSelected});
 				graphics.highlightSquare({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, validPlace:validPlace});
 				graphics.drawTower({x:mousePos.x, y:mousePos.y, type:typeSelectedBuild, dir:'l', rows:rows, cols:cols});
