@@ -87,6 +87,48 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		return that;
 	}
 
+	function AirCreep(spec) {
+		var that = Creep(spec);
+
+		var nextFrame = 0.0;
+
+		that.update = function(timePassed) {
+			if(spec.dir == 'r') {
+				spec.x += spec.spd * (timePassed / 1000);
+			}
+			else if(spec.dir == 'l') {
+				spec.x -= spec.spd * (timePassed / 1000);
+			}
+			else if(spec.dir == 'u') {
+				spec.y -= spec.spd * (timePassed / 1000);
+			}
+			else if(spec.dir == 'd') {
+				spec.y += spec.spd * (timePassed / 1000);
+			}
+			else {
+				spec.x += spec.spd * (timePassed / 1000);
+			}
+			
+			spec.frameNo += 1;
+			spec.frameNo = spec.frameNo % 4;
+		}
+
+		return that;
+	}
+
+	function CreepFactory(spec) {
+		var that;
+
+		if(spec.type == 'air-creep') {
+			that = AirCreep(spec);
+		}
+		else {
+			that = Creep(spec);
+		}
+
+		return that;
+	}
+
 	// used for input
 	var keyboard = input.Keyboard();
 	var mouse = input.Mouse();
@@ -459,7 +501,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			var xDist = rect.width / cols;
 			var yDist = rect.height / rows;
 
-			var select = Math.floor(Math.random() * 3);
+			var select = Math.floor(Math.random() * 4);
 			var type;
 
 			switch(select) {
@@ -472,9 +514,12 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			case 2:
 				type = 'snake-creep';
 				break;
+			case 3:
+				type = 'air-creep';
+				break;
 			}
 
-			creeps.push(Creep({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, spd:200, dir:'r'}));
+			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, spd:200, dir:'r'}));
 
 			console.log(creeps[creeps.length - 1].type);
 
