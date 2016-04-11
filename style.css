@@ -5,6 +5,7 @@ body {
 	width: 1300px;
 	margin: auto;
 	background: url("./textures/backgrounds/grass.jpg");
+	background-size: cover;
 }
 
 ul {
