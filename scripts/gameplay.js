@@ -346,12 +346,12 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		var canvasRect = mouse.getCanvasBounds();
 		var mousePos = mouse.getMouse();
 
+		var xDist = canvasRect.width / cols;
+		var yDist = canvasRect.height / rows;
+
 		// if the mouse is in the canvas
 		if(mouse.inCanvas()) {
 			// calculate grid coordinates for current mouse position
-			var xDist = canvasRect.width / cols;
-			var yDist = canvasRect.height / rows;
-
 			var xPos = Math.floor(mousePos.x / xDist);
 			var yPos = Math.floor(mousePos.y / yDist);
 
@@ -413,6 +413,18 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			if(creeps[i].x > canvasRect.width) {
 				console.log('Creep deleted!');
 				creeps.splice(i, 1);
+			}
+		}
+
+		var myTree = QuadTree();
+
+		for(i = 0; i < creeps.length; i++)
+
+		for(i = 0; i < towers.length; i++) {
+			for(j = 0; j < creeps.length; j++) {
+				if(collides(creeps[j], {x:(towers[i].x + .5) * xDist, y:(towers[i].y + .5) * yDist, r:towers[i].r * xDist})) {
+					console.log("Creep " + creeps[j].type + " in range of " + towers[i].type);
+				}
 			}
 		}
 	}
