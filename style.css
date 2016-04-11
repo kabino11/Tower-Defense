@@ -4,6 +4,7 @@
 body {
 	width: 1300px;
 	margin: auto;
+	background: url("./textures/backgrounds/grass.jpg");
 }
 
 ul {
@@ -118,8 +119,6 @@ h1 {
 
 canvas {
 	float: left;
-
-	background-color: green;
 }
 
 .screen.active {
