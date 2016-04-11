@@ -416,10 +416,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			}
 		}
 
-		var myTree = QuadTree();
-
-		for(i = 0; i < creeps.length; i++)
-
 		for(i = 0; i < towers.length; i++) {
 			for(j = 0; j < creeps.length; j++) {
 				if(collides(creeps[j], {x:(towers[i].x + .5) * xDist, y:(towers[i].y + .5) * yDist, r:towers[i].r * xDist})) {
