@@ -32,7 +32,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			get dir() { return spec.dir; },
 
 			get numFrames() { return spec.numFrames; },
-			get frameNo() { return spec.frameNo; }
+			get frameNo() { return spec.frameNo; },
+
+			get idxNo() { return spec.idxNo; }
 		};
 
 		if(spec.frameNo == undefined) {
@@ -82,6 +84,10 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				spec.frameNo += 1;
 				spec.frameNo = spec.frameNo % 4;
 			}
+		};
+
+		that.setIdxNo = function(idxIn) {
+			spec.idxNo = idxIn;
 		};
 
 		return that;
@@ -425,6 +431,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		});
 
 		for(i = 0; i < creeps.length; i++) {
+			creeps[i].setIdxNo(i);
 			creepTree.insert(creeps[i]);
 		}
 
