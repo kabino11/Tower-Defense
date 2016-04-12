@@ -274,7 +274,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			// update pathfinding for creeps
 			blobPath(pathArray);
-			printPaths();
+			//printPaths();
 
 			//console.log(typeSelectedBuild + ' tower built');
 
@@ -416,10 +416,29 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			}
 		}
 
+		// put creeps into a quadtree for tower targeting
+		var creepTree = new Quadtree({
+			x: 0,
+			y: 0,
+			w: canvasRect.width,
+			h: canvasRect.height
+		});
+
+		for(i = 0; i < creeps.length; i++) {
+			creepTree.insert(creeps[i]);
+		}
+
 		for(i = 0; i < towers.length; i++) {
-			for(j = 0; j < creeps.length; j++) {
-				if(collides(creeps[j], {x:(towers[i].x + .5) * xDist, y:(towers[i].y + .5) * yDist, r:towers[i].r * xDist})) {
-					console.log("Creep " + creeps[j].type + " in range of " + towers[i].type);
+			var creepArray = creepTree.retrieve({
+				x:(towers[i].x + .5) * xDist,
+				y:(towers[i].y + .5) * yDist,
+				w:2 * towers[i].r * xDist,
+				h:2 * towers[i].r * yDist
+			})
+
+			for(j = 0; j < creepArray.length; j++) {
+				if(collides(creepArray[j], {x:(towers[i].x + .5) * xDist, y:(towers[i].y + .5) * yDist, r:towers[i].r * xDist})) {
+					console.log("Creep " + creepArray[j].type + " in range of " + towers[i].type);
 				}
 			}
 		}
