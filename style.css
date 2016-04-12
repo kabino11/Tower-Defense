@@ -49,17 +49,17 @@ h1 {
 }
 
 .screen button {
-	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#8ce047+0,9dbc00+55 */
-background: #8ce047; /* Old browsers */
-background: -moz-radial-gradient(center, ellipse cover,  #8ce047 0%, #9dbc00 55%); /* FF3.6-15 */
-background: -webkit-radial-gradient(center, ellipse cover,  #8ce047 0%,#9dbc00 55%); /* Chrome10-25,Safari5.1-6 */
-background: radial-gradient(ellipse at center,  #8ce047 0%,#9dbc00 55%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8ce047', endColorstr='#9dbc00',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#b8c6df+0,6d88b7+100;Grey+Blue+3D+%231 */
+	background: #b8c6df; /* Old browsers */
+	background: -moz-radial-gradient(center, ellipse cover,  #b8c6df 0%, #6d88b7 100%); /* FF3.6-15 */
+	background: -webkit-radial-gradient(center, ellipse cover,  #b8c6df 0%,#6d88b7 100%); /* Chrome10-25,Safari5.1-6 */
+	background: radial-gradient(ellipse at center,  #b8c6df 0%,#6d88b7 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b8c6df', endColorstr='#6d88b7',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
 	font-size: 25px;
 	border: none;
 	width: 150px;
-	height: 75px;
+	height: 100px;
 	margin-bottom: 35px;
 	font-weight: bold;
 	font-family: fantasy;
@@ -73,7 +73,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8ce047', end
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7db9e8', endColorstr='#e31e5799',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
 	width: 160px;
-	height: 80px;
+	height: 100px;
 	margin-bottom: 32px;
 }
 
@@ -148,4 +148,36 @@ canvas {
 	padding-bottom: 1px;
 	text-align: center;
 	font-size: 25px;
+}
+
+#flametower{
+  background-image: url("./textures/flame-tower.png");
+  height: 30px;
+  width:  30px;
+	margin: 0 auto;
+}
+
+#canontower{
+  background-image: url("./textures/cannon-tower.png");
+  height: 30px;
+  width:  30px;
+	margin: 0 auto;
+}
+
+#icetower{
+  background-image: url("./textures/freeze-tower.png");
+  height: 30px;
+  width:  30px;
+	margin: 0 auto;
+}
+
+#antiairtower{
+  background-image: url("./textures/anti-air-tower.png");
+  height: 30px;
+  width:  30px;
+	margin: 0 auto;
+}
+
+.tower-image p{
+	margin : 0;
 }
