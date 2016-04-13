@@ -29,11 +29,49 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			var closest = undefined;
 			var closestDist = 99999;
 
-
-
 			for(var i = 0; i < targets.length; i++) {
 				var cxCenter = targets[i].x + targets[i].w / 2;
 				var cyCenter = targets[i].y + targets[i].h / 2;
+
+				var xSquare = cxCenter - xPos;
+				xSquare *= xSquare;
+				var ySquare = cyCenter - yPos;
+				ySquare *= ySquare;
+				var dist = Math.sqrt(xSquare + ySquare);
+
+				if(dist < closestDist) {
+					closestDist = dist;
+					closest = targets[i];
+				}
+			}
+
+			if(closest == undefined) {
+				return;
+			}
+
+			var cXpos = closest.x + closest.w / 2;
+			var cYpos = closest.y + closest.h / 2;
+
+			spec.angle = Math.acos((cXpos - xPos) / closestDist);
+
+			if(Math.asin((yPos - cYpos) / closestDist) < 0) {
+				spec.angle = 2 * Math.PI - spec.angle;
+			}
+
+			if(spec.angle > 0 && spec.angle < Math.PI / 4) {
+				spec.dir = 'r';
+			}
+			else if(spec.angle >= Math.PI / 4 && spec.angle <= Math.PI * 3 / 4) {
+				spec.dir = 'u';
+			}
+			else if (spec.angle > Math.PI * 3 / 4 && spec.angle < Math.PI * 5 / 4) {
+				spec.dir = 'l';
+			}
+			else if (spec.angle >= Math.PI * 5 / 4 && spec.angle <= Math.PI * 7 / 4) {
+				spec.dir = 'd';
+			}
+			else {
+				spec.dir = 'r';
 			}
 		}
 
@@ -398,26 +436,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 					validPlace = false;
 					break;
 				}
-
-				var towX = (towers[i].x + .5) * xDist;
-				var towY = (towers[i].y + .5) * yDist;
-
-				if(Math.abs(towX - mousePos.x) > Math.abs(towY - mousePos.y)) {
-					if(towX > mousePos.x) {
-						towers[i].setDir('l');
-					}
-					else {
-						towers[i].setDir('r');
-					}
-				}
-				else {
-					if(towY > mousePos.y) {
-						towers[i].setDir('u');
-					}
-					else {
-						towers[i].setDir('d');
-					}
-				}
 			}
 
 			// if we're building and already don't have a tower under the mouse
@@ -471,14 +489,19 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				y:(towers[i].y + .5) * yDist,
 				w:2 * towers[i].r * xDist,
 				h:2 * towers[i].r * yDist
-			})
+			});
+
+			var targets = [];
 
 			for(j = 0; j < creepArray.length; j++) {
 				if(collides(creepArray[j], {x:(towers[i].x + .5) * xDist, y:(towers[i].y + .5) * yDist, r:towers[i].r * xDist})) {
 					//DEBUG ONLY, SEVERELY HURTS PERFORMANCE TO USE THIS LOG output
 					//console.log("Creep " + creepArray[j].type + " in range of " + towers[i].type);
+					targets.push(creepArray[j]);
 				}
 			}
+
+			towers[i].shoot(targets, xDist, yDist);
 		}
 	}
 
