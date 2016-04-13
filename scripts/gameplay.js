@@ -31,6 +31,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			get spd() { return spec.spd; },
 			get dir() { return spec.dir; },
 
+			get totalHP() { return spec.totalHP; },
+			get HP() { return spec.HP; },
+
 			get numFrames() { return spec.numFrames; },
 			get frameNo() { return spec.frameNo; },
 
@@ -39,6 +42,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		if(spec.frameNo == undefined) {
 			spec.frameNo = 0;
+		}
+		//check if hp has been set, if not set default values
+		if(spec.totalHP == undefined) {
+			spec.totalHP = 10;
+		}
+		if(spec.HP == undefined) {
+			spec.HP = spec.totalHP;
 		}
 
 		var nextFrame = 0.0;
