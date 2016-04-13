@@ -526,36 +526,28 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		document.getElementById('cannon-tower').addEventListener('click', function() {
 			typeSelectedBuild = 'cannon-tower';
 			rangeSelected = 4;
-			document.getElementById('selection-display').innerHTML = 'Cannon tower selected';
-			console.log(typeSelectedBuild + ' tower selected');
-
+			document.getElementById('towerinfo').innerHTML = "Cannon tower selected" + "<br />Cost: 5<br>Range: " + rangeSelected  + "<br />Damage: 10";
 			startBuildMode();
 		});
 
 		document.getElementById('flame-tower').addEventListener('click', function() {
 			typeSelectedBuild = 'flame-tower';
 			rangeSelected = 2;
-			document.getElementById('selection-display').innerHTML = 'Flame tower selected';
-			console.log(typeSelectedBuild + ' tower selected');
-
+			document.getElementById('towerinfo').innerHTML = 'Flame tower selected' + "<br />Cost: 5<br>Range: " + rangeSelected  + "<br />Damage: 10";
 			startBuildMode();
 		});
 
 		document.getElementById('freeze-tower').addEventListener('click', function() {
 			typeSelectedBuild = 'freeze-tower';
 			rangeSelected = 3;
-			document.getElementById('selection-display').innerHTML = 'Freeze tower selected';
-			console.log(typeSelectedBuild + ' tower selected');
-
+			document.getElementById('towerinfo').innerHTML = 'Freeze tower selected'+"<br />Cost: 5<br>Range: " + rangeSelected  + "<br />Damage: 10";
 			startBuildMode();
 		});
 
 		document.getElementById('anti-air-tower').addEventListener('click', function() {
 			typeSelectedBuild = 'anti-air-tower';
 			rangeSelected = 5;
-			document.getElementById('selection-display').innerHTML = 'Anti-Air tower selected';
-			console.log(typeSelectedBuild + ' tower selected');
-
+			document.getElementById('towerinfo').innerHTML = 'Anti-Air tower selected' + "<br />Cost: 5<br>Range: " + rangeSelected  + "<br />Damage: 10";
 			startBuildMode();
 		});
 
@@ -584,11 +576,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				break;
 			}
 
+			document.getElementById('towerinfo').innerHTML = "";
+			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
 			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, spd:200, dir:'r'}));
 
-			console.log(creeps[creeps.length - 1].type);
+			//console.log(creeps[creeps.length - 1].type);
 
-			console.log('Creep button pressed!');
+			//console.log('Creep button pressed!');
 		});
 	}
 
