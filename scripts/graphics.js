@@ -133,6 +133,10 @@ Game.graphics = (function() {
 
 		that.draw = function(args) {};
 
+		/*******
+		*This function shows how much life a creep has.
+		********/
+
 		that.drawCreepLifeIndicator = function(args){
 			context.beginPath();
 	    context.rect(args.x + 5, args.y - 20, 30, 10);
@@ -142,6 +146,7 @@ Game.graphics = (function() {
 			context.stroke();
 	    context.closePath();
 		}
+		
 		return that;
 	}
 
