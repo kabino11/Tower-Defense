@@ -8,14 +8,34 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			get x() { return spec.x; },
 			get y() { return spec.y; },
 			get r() { return spec.r; },
-			get dir() { return spec.dir }
+			get dir() { return spec.dir },
+			get angle() { return spec.angle }
 		};
+
+		if(spec.angle == undefined) {
+			spec.angle = 0;
+		}
 
 		that.setDir = function(dir) {
 			if(dir == 'u' || dir == 'd' || dir == 'r' || dir == 'l') {
 				spec.dir = dir;
 			}
 		};
+
+		that.shoot = function(targets, xDist, yDist) {
+			var xPos = (spec.x + .5) * xDist,
+				yPos = (spec.y + .5) * yDist;
+
+			var closest = undefined;
+			var closestDist = 99999;
+
+
+
+			for(var i = 0; i < targets.length; i++) {
+				var cxCenter = targets[i].x + targets[i].w / 2;
+				var cyCenter = targets[i].y + targets[i].h / 2;
+			}
+		}
 
 		return that;
 	}
@@ -427,7 +447,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		for(i = creeps.length - 1; i >= 0; i--) {
 			creeps[i].update(timePassed, pathArray);
 			if(creeps[i].x > canvasRect.width) {
-				console.log('Creep deleted!');
+				//console.log('Creep deleted!');
 				creeps.splice(i, 1);
 			}
 		}
@@ -455,7 +475,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			for(j = 0; j < creepArray.length; j++) {
 				if(collides(creepArray[j], {x:(towers[i].x + .5) * xDist, y:(towers[i].y + .5) * yDist, r:towers[i].r * xDist})) {
-					console.log("Creep " + creepArray[j].type + " in range of " + towers[i].type);
+					//DEBUG ONLY, SEVERELY HURTS PERFORMANCE TO USE THIS LOG output
+					//console.log("Creep " + creepArray[j].type + " in range of " + towers[i].type);
 				}
 			}
 		}
