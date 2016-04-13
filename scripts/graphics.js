@@ -24,7 +24,7 @@ Game.graphics = (function() {
 		var that = {},
 			image = new Image();
 
-		image.onload = function() { 
+		image.onload = function() {
 			//
 			// Our clever trick, replace the draw function once the image is loaded...no if statements!
 			that.draw = function(args) {
@@ -48,7 +48,7 @@ Game.graphics = (function() {
 				default:
 					toUse = 0;
 				}
-				
+
 				//
 				// Pick the selected sprite from the sprite sheet to render
 				context.drawImage(
@@ -58,7 +58,7 @@ Game.graphics = (function() {
 					args.x,	// Where to draw the sprite
 					args.y,
 					args.width, args.height);
-				
+
 				context.restore();
 			};
 			//
@@ -119,7 +119,7 @@ Game.graphics = (function() {
 					args.x,	args.y, 					// Where to draw the sprite
 					args.w, args.h						// Draw output size
 				);
-				
+
 				context.restore();
 			};
 
@@ -132,6 +132,16 @@ Game.graphics = (function() {
 		console.log('Using ' + image.src);
 
 		that.draw = function(args) {};
+
+		that.drawCreepLifeIndicator = function(args){
+			context.beginPath();
+	    context.rect(args.x + 5, args.y - 20, 30, 10);
+	    context.fillStyle = 'yellow';
+	    context.fill();
+			context.strokeStyle = "#000";
+			context.stroke();
+	    context.closePath();
+		}
 		return that;
 	}
 
@@ -218,6 +228,7 @@ Game.graphics = (function() {
 
 		if(animatedDirectionalSpriteSheets.hasOwnProperty(spec.type)) {
 			animatedDirectionalSpriteSheets[spec.type].draw(spec);
+			animatedDirectionalSpriteSheets[spec.type].drawCreepLifeIndicator(spec);
 		}
 		else {
 			animatedDirectionalSpriteSheets[spec.type] = AnimatedDirectionalSprite({type:spec.type});
@@ -246,7 +257,7 @@ Game.graphics = (function() {
 		for(i = 0; i < spec.rows; i++) {
 			context.moveTo(0, yDist * (i + 1));
 			context.lineTo(canvas.width, yDist * (i + 1));
-		} 
+		}
 
 		context.lineWidth = 4;
 		context.stroke();
@@ -319,17 +330,17 @@ Game.graphics = (function() {
 
 	function drawImage(spec) {
 		context.save();
-		
+
 		context.translate(spec.center.x, spec.center.y);
 		context.rotate(spec.rotation);
 		context.translate(-spec.center.x, -spec.center.y);
-		
+
 		context.drawImage(
-			spec.image, 
-			spec.center.x - spec.size/2, 
+			spec.image,
+			spec.center.x - spec.size/2,
 			spec.center.y - spec.size/2,
 			spec.size, spec.size);
-		
+
 		context.restore();
 	}
 
