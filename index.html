@@ -18,7 +18,9 @@
 			</ul>
 		</div>
 		<div id="game-play" class="screen">
-			<canvas id="gameplay-canvas" height="900px" width="900px"></canvas>
+			<div id="canvas-div">
+				<canvas id="gameplay-canvas" height="900px" width="900px"></canvas>
+			</div>
 			<div id="side-menu" class="center">
 				<div id="tower-buttons">
 					<button id="cannon-tower">
@@ -61,11 +63,17 @@
 								</p>
 						</div></button>
 				</div>
-				<p id='selection-display'></p>
-					<div class="shake-little">
-						<button id="start-wave">Start</button>
-					</div>
+				<div id="info-center">
+            <p id="towerinfo">flametower selected!<br>Cost: 5<br>Range: 60<br>Damage: 10</p>
+            <p id="gameinfo"></p>
+						<p id='selection-display'></p>
+        </div>
+				<div class="shake-little">
+					<button id="start-wave">Start</button>
+				</div>
 			</div>
+		</div>
+		<div class="clear">
 		</div>
 		<div id="help" class="screen">
 			<h1>Help</h1>
