@@ -8,12 +8,23 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			get x() { return spec.x; },
 			get y() { return spec.y; },
 			get r() { return spec.r; },
-			get dir() { return spec.dir },
-			get angle() { return spec.angle }
+			get dir() { return spec.dir; },
+			get angle() { return spec.angle; },
+
+			get level() { return spec.level; },
+			get damage() { return spec.damage; }
 		};
 
 		if(spec.angle == undefined) {
 			spec.angle = 0;
+		}
+
+		if(spec.level == undefined) {
+			spec.level = 1;
+		}
+
+		if(spec.damage == undefined) {
+			spec.damage = 5;
 		}
 
 		that.setDir = function(dir) {
@@ -25,6 +36,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		that.shoot = function(targets, xDist, yDist) {
 			var xPos = (spec.x + .5) * xDist,
 				yPos = (spec.y + .5) * yDist;
+
+
 
 			var closest = undefined;
 			var closestDist = 99999;
@@ -235,8 +248,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	var rangeSelected;
 	var build_mode;
 
-	// functions used for game operation
-
 	// starts build mode if it hasn't been started yet
 	function startBuildMode() {
 		if(!build_mode) {
@@ -374,8 +385,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 	// stops the game loop, deregisters keys, and takes you to the main menu
 	function quitGame() {
-		document.getElementById('selection-display').innerHTML = '';
-
 		typeSelectedBuild = undefined;
 
 		if(build_mode) {
