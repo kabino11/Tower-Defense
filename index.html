@@ -8,7 +8,9 @@
 	</head>
 	<body onload = "Game.game.initalize();">
 		<div id="main-menu" class="screen">
-			<img src="textures/logo/logo_brown.png" />
+			<div class="shake-little">
+				<img src="textures/logo/logo_brown.png" />
+			</div>
 			<ul>
 				<li> <button id="main->new-game">New&nbsp;Game</button> </li>
 				<li> <button id="main->help">Help</button> </li>
@@ -59,10 +61,10 @@
 								</p>
 						</div></button>
 				</div>
-
 				<p id='selection-display'></p>
-
-				<button id="start-wave">Start</button>
+					<div class="shake-little">
+						<button id="start-wave">Start</button>
+					</div>
 			</div>
 		</div>
 		<div id="help" class="screen">

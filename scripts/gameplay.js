@@ -124,7 +124,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			else {
 				spec.x += spec.spd * (timePassed / 1000);
 			}
-			
+
 			spec.frameNo += 1;
 			spec.frameNo = spec.frameNo % 4;
 		}
@@ -325,7 +325,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			window.removeEventListener('mousedown', buildClick);
 		}
-		
+
 		running = false;
 		keyboard.deregisterCommand(quitGame);
 		window.cancelAnimationFrame(currentFrame);
@@ -341,7 +341,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		keyboard.update(currentTime - prevTime);
 
 		update(currentTime - prevTime);
-		
+
 		//then update particles (done independently of game update so that they can move even on the game over screen)
 		graphics.updateParticles(currentTime - prevTime);
 
