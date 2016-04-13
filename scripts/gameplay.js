@@ -10,6 +10,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			get r() { return spec.r; },
 			get dir() { return spec.dir; },
 			get angle() { return spec.angle; },
+			get rotRate() { return spec.rotRate; },
 
 			get level() { return spec.level; },
 			get damage() { return spec.damage; }
@@ -17,6 +18,10 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		if(spec.angle == undefined) {
 			spec.angle = 0;
+		}
+
+		if(spec.rotRate == undefined) {
+			spec.rotRate = Math.PI;
 		}
 
 		if(spec.level == undefined) {
@@ -34,23 +39,38 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		};
 
 		that.shoot = function(targets, xDist, yDist) {
+			//first we find the centerpoint of our tower
 			var xPos = (spec.x + .5) * xDist,
 				yPos = (spec.y + .5) * yDist;
 
+			for(var i = 0; i < targets.length; i++) {
+				var cXpos = targets[i].x + targets[i].w / 2;
+				var cYpos = targets[i].y + targets[i].h / 2;
+				var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
 
+				var fireAngle = Math.acos((cXpos - xPos) / dist);
 
+				if(Math.asin((cYpos - yPos) / closestDist) < 0) {
+					fireAngle = 2 * Math.PI - fireAngle;
+				}
+
+				console.log("Fire angle: " + fireAngle);
+				console.log(spec.angle);
+
+				if(Math.abs(spec.angle - fireAngle) < .1) {
+					creeps[targets[i].idxNo].giveDamage(spec.damage);
+					return;
+				}
+			}
+
+			// then if there's nothing to shoot at where we're pointing then rotate likewise
 			var closest = undefined;
 			var closestDist = 99999;
 
-			for(var i = 0; i < targets.length; i++) {
+			for(i = 0; i < targets.length; i++) {
 				var cxCenter = targets[i].x + targets[i].w / 2;
 				var cyCenter = targets[i].y + targets[i].h / 2;
-
-				var xSquare = cxCenter - xPos;
-				xSquare *= xSquare;
-				var ySquare = cyCenter - yPos;
-				ySquare *= ySquare;
-				var dist = Math.sqrt(xSquare + ySquare);
+				var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
 
 				if(dist < closestDist) {
 					closestDist = dist;
@@ -67,7 +87,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			spec.angle = Math.acos((cXpos - xPos) / closestDist);
 
-			if(Math.asin((yPos - cYpos) / closestDist) < 0) {
+			if(Math.asin((cYpos - yPos) / closestDist) < 0) {
 				spec.angle = 2 * Math.PI - spec.angle;
 			}
 
@@ -75,13 +95,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				spec.dir = 'r';
 			}
 			else if(spec.angle >= Math.PI / 4 && spec.angle <= Math.PI * 3 / 4) {
-				spec.dir = 'u';
+				spec.dir = 'd';
 			}
 			else if (spec.angle > Math.PI * 3 / 4 && spec.angle < Math.PI * 5 / 4) {
 				spec.dir = 'l';
 			}
 			else if (spec.angle >= Math.PI * 5 / 4 && spec.angle <= Math.PI * 7 / 4) {
-				spec.dir = 'd';
+				spec.dir = 'u';
 			}
 			else {
 				spec.dir = 'r';
@@ -166,6 +186,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				spec.frameNo = spec.frameNo % 4;
 			}
 		};
+
+		that.giveDamage = function(dmgIn) {
+			spec.HP -= dmgIn;
+			if(spec.HP < 0) {
+				spec.HP = 0;
+			}
+		}
 
 		that.setIdxNo = function(idxIn) {
 			spec.idxNo = idxIn;
@@ -539,7 +566,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		// now draw the currently placed towers
 		for(var i = 0; i < towers.length; i++) {
-			graphics.drawTower({row:towers[i].x, col:towers[i].y, type:towers[i].type, placing:false, dir:towers[i].dir, rows:rows, cols:cols});
+			graphics.drawTower({row:towers[i].x, col:towers[i].y, type:towers[i].type, placing:false, dir:towers[i].dir, angle:towers[i].angle, rows:rows, cols:cols});
 		}
 
 		// now draw all existing creeps
