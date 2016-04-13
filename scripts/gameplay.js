@@ -356,7 +356,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			build_mode = false;
 			typeSelectedBuild = undefined;
 
-			document.getElementById('selection-display').innerHTML = '';
+			document.getElementById('towerinfo').innerHTML = '';
 
 			window.removeEventListener('mousedown', buildClick);
 
