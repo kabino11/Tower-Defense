@@ -43,6 +43,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			var xPos = (spec.x + .5) * xDist,
 				yPos = (spec.y + .5) * yDist;
 
+			//then we need to find if there's a creep in front of our gun
 			for(var i = 0; i < targets.length; i++) {
 				var cXpos = targets[i].x + targets[i].w / 2;
 				var cYpos = targets[i].y + targets[i].h / 2;
@@ -50,20 +51,18 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 				var fireAngle = Math.acos((cXpos - xPos) / dist);
 
-				if(Math.asin((cYpos - yPos) / closestDist) < 0) {
+				if(Math.asin((cYpos - yPos) / dist) < 0) {
 					fireAngle = 2 * Math.PI - fireAngle;
 				}
 
-				console.log("Fire angle: " + fireAngle);
-				console.log(spec.angle);
-
+				// if so shoot at it
 				if(Math.abs(spec.angle - fireAngle) < .1) {
 					creeps[targets[i].idxNo].giveDamage(spec.damage);
 					return;
 				}
 			}
 
-			// then if there's nothing to shoot at where we're pointing then rotate likewise
+			// then if there's nothing to shoot at where we're pointing then find the minion closest to us and rotate likewise
 			var closest = undefined;
 			var closestDist = 99999;
 
@@ -78,10 +77,12 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				}
 			}
 
+			// if there's nothing to shoot at just return
 			if(closest == undefined) {
 				return;
 			}
 
+			// otherwise rotate to closest (in final will rotate by set speet)
 			var cXpos = closest.x + closest.w / 2;
 			var cYpos = closest.y + closest.h / 2;
 
