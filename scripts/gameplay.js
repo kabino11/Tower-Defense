@@ -505,7 +505,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		document.getElementById('cannon-tower').addEventListener('click', function() {
 			typeSelectedBuild = 'cannon-tower';
 			rangeSelected = 4;
-			document.getElementById('selection-display').innerHTML = document.getElementById('cannon-tower').innerHTML + ' tower selected';
+			document.getElementById('selection-display').innerHTML = 'Cannon tower selected';
 			console.log(typeSelectedBuild + ' tower selected');
 
 			startBuildMode();
@@ -514,7 +514,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		document.getElementById('flame-tower').addEventListener('click', function() {
 			typeSelectedBuild = 'flame-tower';
 			rangeSelected = 2;
-			document.getElementById('selection-display').innerHTML = document.getElementById('flame-tower').innerHTML + ' tower selected';
+			document.getElementById('selection-display').innerHTML = 'Flame tower selected';
 			console.log(typeSelectedBuild + ' tower selected');
 
 			startBuildMode();
@@ -523,7 +523,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		document.getElementById('freeze-tower').addEventListener('click', function() {
 			typeSelectedBuild = 'freeze-tower';
 			rangeSelected = 3;
-			document.getElementById('selection-display').innerHTML = document.getElementById('freeze-tower').innerHTML + ' tower selected';
+			document.getElementById('selection-display').innerHTML = 'Freeze tower selected';
 			console.log(typeSelectedBuild + ' tower selected');
 
 			startBuildMode();
@@ -532,7 +532,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		document.getElementById('anti-air-tower').addEventListener('click', function() {
 			typeSelectedBuild = 'anti-air-tower';
 			rangeSelected = 5;
-			document.getElementById('selection-display').innerHTML = document.getElementById('anti-air-tower').innerHTML + ' tower selected';
+			document.getElementById('selection-display').innerHTML = 'Anti-Air tower selected';
 			console.log(typeSelectedBuild + ' tower selected');
 
 			startBuildMode();
