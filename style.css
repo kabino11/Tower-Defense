@@ -204,7 +204,9 @@ canvas {
 	opacity: 0.8;
   font-weight: bolder;
 	width: 80%;
+	height: 200px;
 	margin: 0 auto 60px;
+	overflow-y: scroll;
 }
 
 

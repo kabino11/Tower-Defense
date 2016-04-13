@@ -138,22 +138,40 @@ Game.graphics = (function() {
 		********/
 
 		that.drawCreepLifeIndicator = function(args){
-			context.beginPath();
-	    context.rect(args.x + 5, args.y - 20, 40, 10);
-	    context.fillStyle = 'red';
-	    context.fill();
-			context.strokeStyle = "#000";
-			context.stroke();
-	    context.closePath();
+			if(args.y < 30){
+				context.beginPath();
+		    context.rect(args.x + 5, args.y + 10, 40, 10);
+		    context.fillStyle = 'red';
+		    context.fill();
+				context.strokeStyle = "#000";
+				context.stroke();
+		    context.closePath();
 
-			context.beginPath();
-	    context.rect(args.x + 5, args.y - 20, 40 * (args.HP/args.totalHP), 10);
-	    context.fillStyle = 'yellow';
-	    context.fill();
-			context.strokeStyle = "#000";
-			context.stroke();
-	    context.closePath();
+				context.beginPath();
+		    context.rect(args.x + 5, args.y + 10, 40 * (args.HP/args.totalHP), 10);
+		    context.fillStyle = 'yellow';
+		    context.fill();
+				context.strokeStyle = "#000";
+				context.stroke();
+		    context.closePath();
 
+			}else{
+				context.beginPath();
+		    context.rect(args.x + 5, args.y - 20, 40, 10);
+		    context.fillStyle = 'red';
+		    context.fill();
+				context.strokeStyle = "#000";
+				context.stroke();
+		    context.closePath();
+
+				context.beginPath();
+		    context.rect(args.x + 5, args.y - 20, 40 * (args.HP/args.totalHP), 10);
+		    context.fillStyle = 'yellow';
+		    context.fill();
+				context.strokeStyle = "#000";
+				context.stroke();
+		    context.closePath();
+			}
 		}
 
 		return that;
