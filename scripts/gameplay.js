@@ -573,10 +573,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			}
 		}
 
-		if(creeps.length == 0) {
-			document.getElementById('gameinfo').innerHTML = '';
-		}
-
 		// put creeps into a quadtree for tower targeting
 		var creepTree = new Quadtree({
 			x: 0,
@@ -585,11 +581,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			h: canvasRect.height
 		});
 
+		// now put our creeps into a quadtree for easier hitbox detection
 		for(i = 0; i < creeps.length; i++) {
 			creeps[i].setIdxNo(i);
 			creepTree.insert(creeps[i]);
 		}
 
+		// now iterate through all the towers to shoot at creeps
 		for(i = 0; i < towers.length; i++) {
 			var creepArray = creepTree.retrieve({
 				x:(towers[i].x + .5) * xDist,
@@ -600,17 +598,22 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			var targets = [];
 
+			// now for every creep that can be targeted test for in range
+			// if so put it into an array to feed to the tower for targeting
 			for(j = 0; j < creepArray.length; j++) {
 				if(collides(creepArray[j], {x:(towers[i].x + .5) * xDist, y:(towers[i].y + .5) * yDist, r:towers[i].r * xDist})) {
-					//DEBUG ONLY, SEVERELY HURTS PERFORMANCE TO USE THIS LOG output
+					//DEBUG ONLY, SEVERELY HURTS PERFORMANCE TO USE THIS LOG OUTPUT
 					//console.log("Creep " + creepArray[j].type + " in range of " + towers[i].type);
 					targets.push(creepArray[j]);
 				}
 			}
 
+			// now have the tower shoot at potential targets
 			towers[i].shoot(targets, xDist, yDist, timePassed);
 		}
 
+		// now iterate through all existing bullets to update, retrieve potential collision candidates,
+		// hit detect on those candidates, and then manage accordingly
 		for(i = bullets.length - 1; i >= 0; i--) {
 			bullets[i].update(timePassed);
 			targets = creepTree.retrieve({
@@ -621,6 +624,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			});
 
 			var hit = false;
+			// if we hit someone indicate that we did, deal damage, and then break out because each bullet deals damage once
 			for(j = 0; j < targets.length; j++) {
 				if(collides(targets[j], bullets[i])) {
 					creeps[targets[j].idxNo].giveDamage(bullets[i].dmg);
@@ -629,6 +633,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				}
 			}
 
+			// if a bullet has hit someone or gone out of range delete.
 			if(hit || bullets[i].traveled >= bullets[i].range) {
 				bullets.splice(i, 1);
 			}
@@ -637,7 +642,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// Then we'll finally delete creeps from the array when they die
 		for(i = creeps.length - 1; i >= 0; i--) {
 			if(creeps[i].HP <= 0) {
-				for(j = 0; j < 20; j++) {
+				for(j = 0; j < 20; j++) { // spawn death particles
 					graphics.spawnParticle({x:creeps[i].x + creeps[i].w / 2, y:creeps[i].y + creeps[i].h / 2});
 				}
 				creeps.splice(i, 1);
@@ -647,6 +652,10 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 	// render function (all output goes through the graphics object)
 	function render() {
+		if(creeps.length == 0) {  // clear gameinfo if creep array is empty
+			document.getElementById('gameinfo').innerHTML = '';
+		}
+		
 		graphics.clear();
 
 		var mousePos = mouse.getMouse();
