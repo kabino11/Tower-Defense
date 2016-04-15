@@ -254,7 +254,7 @@ Game.graphics = (function() {
 		context.lineWidth = 2;
 		context.strokeStyle = 'black';
 		context.moveTo(xPos, yPos);
-		context.lineTo(xPos + xDist * Math.cos(spec.angle), yPos + yDist * Math.sin(spec.angle));
+		context.lineTo(xPos + xDist / 2 * Math.cos(spec.angle), yPos + yDist / 2 * Math.sin(spec.angle));
 		context.stroke();
 
 		context.restore();

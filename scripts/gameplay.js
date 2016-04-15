@@ -64,13 +64,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 					var fireAngle = Math.acos((cXpos - xPos) / dist);
 
 					if(Math.asin((cYpos - yPos) / dist) < 0) {
-						fireAngle = 2 * Math.PI - fireAngle;
+						fireAngle = (2 * Math.PI) - fireAngle;
 					}
 
 					// if so shoot at it
-					if(Math.abs(spec.angle - fireAngle) < .2) {
+					if(Math.abs(spec.angle - fireAngle) < .1) {
 						spec.shotTimer = spec.timeBetweenShots;
-						bullets.push(Bullet({x:xPos, y:yPos, r:5, spd:500, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+						bullets.push(Bullet({x:xPos, y:yPos, r:5, spd:750, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
 						return;
 					}
 				}
@@ -118,9 +118,19 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			if(cp > 0) {
 				spec.angle += spec.rotRate * timePassed / 1000;
+				currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)};
+				cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+				if(cp <= 0) {
+					spec.angle = targetAngle;
+				}
 			}
 			else if (cp <= 0) {
 				spec.angle -= spec.rotRate * timePassed / 1000;
+				currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)}
+				cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+				if(cp > 0) {
+					spec.angle = targetAngle;
+				}
 			}
 			spec.angle = spec.angle % (Math.PI * 2);
 
@@ -610,20 +620,18 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				h:bullets[i].r * 2
 			});
 
-			if(targets.length > 0) {
-				var hit = false;
-				for(j = 0; j < targets.length; j++) {
-					if(collides(targets[j], bullets[i])) {
-						creeps[targets[j].idxNo].giveDamage(bullets[i].dmg);
-						hit = true;
-						break;
-					}
+			var hit = false;
+			for(j = 0; j < targets.length; j++) {
+				if(collides(targets[j], bullets[i])) {
+					creeps[targets[j].idxNo].giveDamage(bullets[i].dmg);
+					hit = true;
+					break;
 				}
+			}
 
-				if(hit || bullets[i].traveled >= bullets[i].range) {
-					bullets.splice(i, 1);
-				}
-			}	
+			if(hit || bullets[i].traveled >= bullets[i].range) {
+				bullets.splice(i, 1);
+			}
 		}
 
 		// Then we'll finally delete creeps from the array when they die
