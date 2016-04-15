@@ -68,9 +68,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 					}
 
 					// if so shoot at it
-					if(Math.abs(spec.angle - fireAngle) < .1) {
-						creeps[targets[i].idxNo].giveDamage(spec.damage);
+					if(Math.abs(spec.angle - fireAngle) < .2) {
 						spec.shotTimer = spec.timeBetweenShots;
+						bullets.push(Bullet({x:xPos, y:yPos, r:5, spd:500, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
 						return;
 					}
 				}
@@ -276,6 +276,29 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		return that;
 	}
 
+	function Bullet(spec) {
+		var that = {
+			get x() { return spec.x; },
+			get y() { return spec.y; },
+			get r() { return spec.r; },
+			get range() { return spec.range; },
+			get traveled() { return spec.traveled; },
+			get spd() { return spec.spd; },
+			get angle() { return spec.angle; },
+			get dmg() { return spec.dmg; }
+		};
+
+		spec.traveled = 0;
+
+		that.update = function(timePassed) {
+			spec.traveled += spec.spd * timePassed / 1000;
+			spec.x += spec.spd * Math.cos(spec.angle) * timePassed / 1000;
+			spec.y += spec.spd * Math.sin(spec.angle) * timePassed / 1000;
+		};
+
+		return that;
+	}
+
 	// used for input
 	var keyboard = input.Keyboard();
 	var mouse = input.Mouse();
@@ -295,6 +318,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	// keeps track of towers and creeps in game
 	var towers;
 	var creeps;
+	var bullets;
 
 	// keep track of tower under mouse cursor and bool for keeping track of pathfinding state
 	var towerUnderMouse;
@@ -577,6 +601,31 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			towers[i].shoot(targets, xDist, yDist, timePassed);
 		}
 
+		for(i = bullets.length - 1; i >= 0; i--) {
+			bullets[i].update(timePassed);
+			targets = creepTree.retrieve({
+				x:bullets[i].x - bullets[i].r,
+				y:bullets[i].y - bullets[i].r,
+				w:bullets[i].r * 2,
+				h:bullets[i].r * 2
+			});
+
+			if(targets.length > 0) {
+				var hit = false;
+				for(j = 0; j < targets.length; j++) {
+					if(collides(targets[j], bullets[i])) {
+						creeps[targets[j].idxNo].giveDamage(bullets[i].dmg);
+						hit = true;
+						break;
+					}
+				}
+
+				if(hit || bullets[i].traveled >= bullets[i].range) {
+					bullets.splice(i, 1);
+				}
+			}	
+		}
+
 		// Then we'll finally delete creeps from the array when they die
 		for(i = creeps.length - 1; i >= 0; i--) {
 			if(creeps[i].HP <= 0) {
@@ -619,6 +668,11 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// now draw all existing creeps
 		for(i = 0; i < creeps.length; i++) {
 			graphics.drawCreep(creeps[i]);
+		}
+
+		// now draw all of the bullets
+		for(i = 0; i < bullets.length; i++) {
+			graphics.drawBullet(bullets[i]);
 		}
 
 		// and then draw all of our particles
@@ -700,6 +754,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// initalize our towers and creeps arrays
 		towers = [];
 		creeps = [];
+		bullets = [];
 
 		// initalize tower selection and placement variables
 		towerUnderMouse = undefined;
