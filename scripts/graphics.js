@@ -247,15 +247,16 @@ Game.graphics = (function() {
 			directionalSpriteSheets[spec.type] = DirectionalSpriteSheet({type:spec.type});
 		}
 
-		xPos += xDist/2;
-		yPos += xDist/2;
+		// draw tower direction angle for bugfixing, no longer used
+		//xPos += xDist/2;
+		//yPos += xDist/2;
 
-		context.beginPath();
-		context.lineWidth = 2;
-		context.strokeStyle = 'black';
-		context.moveTo(xPos, yPos);
-		context.lineTo(xPos + xDist / 2 * Math.cos(spec.angle), yPos + yDist / 2 * Math.sin(spec.angle));
-		context.stroke();
+		//context.beginPath();
+		//context.lineWidth = 2;
+		//context.strokeStyle = 'black';
+		//context.moveTo(xPos, yPos);
+		//context.lineTo(xPos + xDist / 2 * Math.cos(spec.angle), yPos + yDist / 2 * Math.sin(spec.angle));
+		//context.stroke();
 
 		context.restore();
 	}
