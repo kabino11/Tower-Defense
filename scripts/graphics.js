@@ -325,8 +325,15 @@ Game.graphics = (function() {
 		var xDist = canvas.width / spec.cols;
 		var yDist = canvas.height / spec.rows;
 
-		var squareX = Math.floor(spec.x / xDist);
-		var squareY = Math.floor(spec.y / yDist);
+		if(spec.hasOwnProperty('x') && spec.hasOwnProperty('y')) {
+			var squareX = Math.floor(spec.x / xDist);
+			var squareY = Math.floor(spec.y / yDist);
+		}
+
+		if(spec.hasOwnProperty('row') && spec.hasOwnProperty('col')) {
+			squareX = spec.row;
+			squareY = spec.col;
+		}
 
 		var xPos = squareX * xDist + 2;
 		var yPos = squareY * yDist + 2;
@@ -351,9 +358,16 @@ Game.graphics = (function() {
 		var xDist = canvas.width / spec.cols;
 		var yDist = canvas.height / spec.rows;
 
-		var squareX = Math.floor(spec.x / xDist);
-		var squareY = Math.floor(spec.y / yDist);
+		if(spec.hasOwnProperty('x') && spec.hasOwnProperty('y')) {
+			var squareX = Math.floor(spec.x / xDist);
+			var squareY = Math.floor(spec.y / yDist);
+		}
 
+		if(spec.hasOwnProperty('row') && spec.hasOwnProperty('col')) {
+			squareX = spec.row;
+			squareY = spec.col;
+		}
+		
 		var xPos = (squareX + .5) * xDist;
 		var yPos = (squareY + .5) * yDist;
 

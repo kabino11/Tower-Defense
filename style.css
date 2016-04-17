@@ -87,6 +87,14 @@ h1 {
 	box-shadow: 2px 2px 2px #000;
 }
 
+.button-hidden {
+  display: none;
+}
+
+.button-hidden.show {
+  display: block;
+}
+
 #tower-buttons {
 	margin-bottom: 60px;
 }

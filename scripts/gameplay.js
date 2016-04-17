@@ -334,6 +334,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	var towerUnderMouse;
 	var validPlace;
 
+	var towerSelected;
+
 	// 2d array for pathfinding
 	var pathArray;
 
@@ -346,6 +348,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	function startBuildMode() {
 		if(!build_mode) {
 			build_mode = true;
+			towerSelected = undefined;
 
 			window.addEventListener('mousedown', buildClick);
 		}
@@ -436,6 +439,23 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 	}
 
+	// Functions invoked via mouse listeners
+	function selectTower() {
+		if(mouse.inCanvas()) {
+			towerSelected = undefined;
+
+			if(!build_mode && towerUnderMouse != undefined) {
+				console.log("Tower select method called!");
+
+				towerSelected = towerUnderMouse;
+				document.getElementById('delete-tower').classList.add('show');
+			}
+			else {
+				document.getElementById('delete-tower').classList.remove('show');
+			}
+		}
+	}
+
 	// function set when building objects
 	// places tower into array upon click
 	function buildClick() {
@@ -486,6 +506,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			window.removeEventListener('mousedown', buildClick);
 		}
+		window.removeEventListener('mousedown', selectTower);
 
 		running = false;
 		keyboard.deregisterCommand(quitGame);
@@ -535,7 +556,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			// iterate through towers, if you find one with the same coordinates as mouse set towerUnderMouse to it and mark it an invalid place for pathing
 			for(var i = 0; i < towers.length; i++) {
 				if(towers[i].x == xPos && towers[i].y == yPos) {
-					towerUnderMouse = towers[i];
+					towerUnderMouse = i;
 					validPlace = false;
 					break;
 				}
@@ -673,8 +694,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			}
 		}
 		else if(towerUnderMouse != undefined) {  //otherwise show data for tower underneath the mouse
-			graphics.highlightRange({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, r:towerUnderMouse.r});
+			graphics.highlightRange({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, r:towers[towerUnderMouse].r});
 			graphics.highlightSquare({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, validPlace:true});
+		}
+
+		if(towerSelected != undefined) {
+			graphics.highlightRange({row:towers[towerSelected].x, col:towers[towerSelected].y, rows:rows, cols:cols, r:towers[towerSelected].r});
+			graphics.highlightSquare({row:towers[towerSelected].x, col:towers[towerSelected].y, rows:rows, cols:cols, r:towers[towerSelected].r, validPlace:true});
 		}
 
 		// now draw the currently placed towers
@@ -728,6 +754,15 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			startBuildMode();
 		});
 
+		document.getElementById('delete-tower').addEventListener('click', function() {
+			console.log('delete-tower called! ' + towerSelected);
+			if(towerSelected != undefined) {
+				towers.splice(towerSelected, 1);
+				towerSelected = undefined;
+				document.getElementById('delete-tower').classList.remove('show');
+			}
+		});
+
 		// set button to spawn creeps
 		document.getElementById('start-wave').addEventListener('click', function() {
 			var rect = mouse.getCanvasBounds();
@@ -768,6 +803,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// register all our keys
 		keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, quitGame);
 
+		window.addEventListener('mousedown', selectTower);
+
 		// initalize our towers and creeps arrays
 		towers = [];
 		creeps = [];
@@ -775,6 +812,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		// initalize tower selection and placement variables
 		towerUnderMouse = undefined;
+		towerSelected = undefined;
 		validPlace = true;
 
 		// initalize game size
