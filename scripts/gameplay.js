@@ -759,7 +759,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			if(towerSelected != undefined) {
 				towers.splice(towerSelected, 1);
 				towerSelected = undefined;
-				pathArray = blobPath(pathArray);
+				blobPath(pathArray);
 				document.getElementById('delete-tower').classList.remove('show');
 			}
 		});
