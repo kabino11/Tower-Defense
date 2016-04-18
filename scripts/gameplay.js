@@ -933,7 +933,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// initalize income
 		income = 100;
 		score = 0;
-		lives = 0;
+		lives = 20;
 
 
 		// initalize the main pathfinding array

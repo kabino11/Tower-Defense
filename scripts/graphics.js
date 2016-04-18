@@ -387,27 +387,27 @@ Game.graphics = (function() {
 	}
 
 	function drawScore(score) {
-		//context2.save();
+		context2.save();
 		context2.font = "30px fantasy";
 	  context2.fillStyle = "#000";
 	  context2.fillText("Score: " + score, 5, 50);
-		//context2.restore();
+		context2.restore();
 	}
 
 	function drawMoney(money) {
-		//context2.save();
+		context2.save();
 		context2.font = "30px fantasy";
 	  context2.fillStyle = "#000";
 	  context2.fillText("Money: " + money, 300, 50);
-		//context2.restore();
+		context2.restore();
 	}
 
 	function drawLives(lives) {
-		//context2.save();
+		context2.save();
 		context2.font = "30px fantasy";
 	  context2.fillStyle = "#000";
 	  context2.fillText("Lives: " + lives, 600, 50);
-		//context2.restore();
+		context2.restore();
 	}
 
 	// generic draw text amd draw image functions
