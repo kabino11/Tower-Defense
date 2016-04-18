@@ -370,7 +370,7 @@ Game.graphics = (function() {
 			squareX = spec.row;
 			squareY = spec.col;
 		}
-		
+
 		var xPos = (squareX + .5) * xDist;
 		var yPos = (squareY + .5) * yDist;
 
@@ -388,19 +388,25 @@ Game.graphics = (function() {
 
 	function drawScore(score) {
 		context2.save();
-
+		context2.font = "24px fantasy";
+	  context2.fillStyle = "#1A98FE";
+	  context2.fillText("Score: " + score, 0, 0);
 		context2.restore();
 	}
 
-	function drawMoney(income) {
+	function drawMoney(money) {
 		context2.save();
-
+		context2.font = "24px fantasy";
+	  context2.fillStyle = "#1A98FE";
+	  context2.fillText("Money: " + money, 300, 0);
 		context2.restore();
 	}
 
 	function drawLives(lives) {
 		context2.save();
-
+		context2.font = "24px fantasy";
+	  context2.fillStyle = "#1A98FE";
+	  context2.fillText("Lives: " + lives, 600, 0);
 		context2.restore();
 	}
 
