@@ -399,6 +399,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	var income;
 	var score;
 	var lives;
+	var wave;
 
 	// keep track of tower under mouse cursor and bool for keeping track of pathfinding state
 	var towerUnderMouse;
@@ -808,6 +809,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		graphics.drawMoney(income);
 		graphics.drawLives(lives);
 		graphics.drawScore(score);
+		graphics.drawWaves(wave);
 	}
 
 	// standard functions for other classes to interact with
@@ -934,6 +936,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		income = 100;
 		score = 0;
 		lives = 20;
+		wave = 0;
 
 
 		// initalize the main pathfinding array
