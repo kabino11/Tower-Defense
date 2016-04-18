@@ -399,7 +399,7 @@ Game.graphics = (function() {
 		context2.save();
 		context2.font = "30px fantasy";
 	  context2.fillStyle = "#000";
-	  context2.fillText("Money: " + money, 300, 50);
+	  context2.fillText("Money: " + money, 200, 50);
 		context2.restore();
 	}
 
@@ -407,7 +407,15 @@ Game.graphics = (function() {
 		context2.save();
 		context2.font = "30px fantasy";
 	  context2.fillStyle = "#000";
-	  context2.fillText("Lives: " + lives, 600, 50);
+	  context2.fillText("Lives: " + lives, 400, 50);
+		context2.restore();
+	}
+
+	function drawWaves(wave) {
+		context2.save();
+		context2.font = "30px fantasy";
+	  context2.fillStyle = "#000";
+	  context2.fillText("Wave: " + wave, 600, 50);
 		context2.restore();
 	}
 
@@ -451,6 +459,7 @@ Game.graphics = (function() {
 		drawScore: drawScore,
 		drawMoney: drawMoney,
 		drawLives: drawLives,
+		drawWaves:drawWaves,
 		drawText: drawText,
 		drawImage: drawImage,
 		spawnParticle: spawnParticle,
