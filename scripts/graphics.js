@@ -217,6 +217,7 @@ Game.graphics = (function() {
 
 	function clear() {
 		context.clear();
+		context2.clear();
 	}
 
 	// draws tower
