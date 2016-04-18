@@ -154,6 +154,27 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		return that;
 	}
 
+	function FlameTower(spec) {
+		var that = Tower(spec);
+
+		spec.damage = 10;
+
+		return that;
+	}
+
+	function TowerFactory(spec) {
+		var that;
+
+		if(spec.type === 'flame-tower') {
+			that = FlameTower(spec);
+		}
+		else {
+			that = Tower(spec);
+		}
+
+		return that;
+	}
+
 	// likewise a basic creep definiteion as well, will subclass out to modify movement parameters (also hp, damage resistance, etc.)
 	function Creep(spec) {
 		var that = {
@@ -273,11 +294,27 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		return that;
 	}
 
+	function ArmoredCreep(spec) {
+		var that = Creep(spec);
+
+		that.giveDamage = function(dmgIn) {
+			spec.HP -= dmgIn / 2;
+			if(spec.HP < 0) {
+				spec.hp = 0;
+			}
+		}
+
+		return that;
+	}
+
 	function CreepFactory(spec) {
 		var that;
 
 		if(spec.type == 'air-creep') {
 			that = AirCreep(spec);
+		}
+		else if(spec.type == 'armored-creep') {
+			that = ArmoredCreep(spec);
 		}
 		else {
 			that = Creep(spec);
@@ -321,6 +358,14 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	var currentTime;
 	var currentFrame = undefined;
 
+	//base tower costs variable
+	var towerCosts = {
+		'cannon-tower': 5,
+		'flame-tower': 10,
+		'freeze-tower': 10,
+		'anti-air-tower': 15
+	};
+
 	// actual game variables to use
 	var rows;
 	var cols;
@@ -329,6 +374,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	var towers;
 	var creeps;
 	var bullets;
+
+	// keep track of player income
+	var income;
 
 	// keep track of tower under mouse cursor and bool for keeping track of pathfinding state
 	var towerUnderMouse;
@@ -347,6 +395,11 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	// starts build mode if it hasn't been started yet
 	function startBuildMode() {
 		if(!build_mode) {
+			if(income < towerCosts[typeSelectedBuild]) {
+				document.getElementById('towerinfo').innerHTML = "Can't afford that";
+				return;
+			}
+
 			build_mode = true;
 			towerSelected = undefined;
 
@@ -469,7 +522,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			var xLoc = Math.floor(mousePos.x / (canvasRect.width / cols));
 			var yLoc = Math.floor(mousePos.y / (canvasRect.height / rows));
 
-			towers.push(Tower({type:typeSelectedBuild, x:xLoc, y:yLoc, r:rangeSelected, dir:'r'}));
+			towers.push(TowerFactory({type:typeSelectedBuild, x:xLoc, y:yLoc, r:rangeSelected, dir:'r'}));
 
 			// update pathfinding for creeps
 			blobPath(pathArray);
@@ -724,33 +777,58 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 	// standard functions for other classes to interact with
 	function initalize() {
-		// create build buttons for all our towers
-		// standard format: set typeSelectedBuild, rangeSelected, display selected, and start build mode
-		document.getElementById('cannon-tower').addEventListener('click', function() {
+		//create mouseover functions for all our towers
+		// standard format: set typeSelectedBuild, rangeSelected, and display selected
+		document.getElementById('cannon-tower').addEventListener('mouseover', function() {
+			if(build_mode) return;
+
 			typeSelectedBuild = 'cannon-tower';
 			rangeSelected = 4;
-			document.getElementById('towerinfo').innerHTML = "Cannon tower selected" + "<br />Cost: 5<br>Range: " + rangeSelected  + "<br />Damage: 10";
+			var temp = TowerFactory({type:typeSelectedBuild, r:rangeSelected})
+			document.getElementById('towerinfo').innerHTML = "Cannon Tower" + "<br />Cost: " + towerCosts[typeSelectedBuild] + "<br>Range: " + rangeSelected  + "<br />Damage: " + temp.damage;
+		});
+
+		document.getElementById('flame-tower').addEventListener('mouseover', function() {
+			if(build_mode) return;
+
+			typeSelectedBuild = 'flame-tower';
+			rangeSelected = 2;
+			var temp = TowerFactory({type:typeSelectedBuild, r:rangeSelected})
+			document.getElementById('towerinfo').innerHTML = 'Flame Tower' + "<br />Cost: " + towerCosts[typeSelectedBuild] + "<br>Range: " + rangeSelected  + "<br />Damage: " + temp.damage;
+		});
+
+		document.getElementById('freeze-tower').addEventListener('mouseover', function() {
+			if(build_mode) return;
+
+			typeSelectedBuild = 'freeze-tower';
+			rangeSelected = 3;
+			var temp = TowerFactory({type:typeSelectedBuild, r:rangeSelected})
+			document.getElementById('towerinfo').innerHTML = 'Freeze Tower'+"<br />Cost: " + towerCosts[typeSelectedBuild] + "<br>Range: " + rangeSelected  + "<br />Damage: " + temp.damage;
+		});
+
+		document.getElementById('anti-air-tower').addEventListener('mouseover', function() {
+			if(build_mode) return;
+
+			typeSelectedBuild = 'anti-air-tower';
+			rangeSelected = 5;
+			var temp = TowerFactory({type:typeSelectedBuild, r:rangeSelected})
+			document.getElementById('towerinfo').innerHTML = 'Anti-Air Tower' + "<br />Cost: " + towerCosts[typeSelectedBuild] + "<br>Range: " + rangeSelected  + "<br />Damage: " + temp.damage;
+		});
+
+		// assign build functions to all our buttons
+		document.getElementById('cannon-tower').addEventListener('click', function() {
 			startBuildMode();
 		});
 
 		document.getElementById('flame-tower').addEventListener('click', function() {
-			typeSelectedBuild = 'flame-tower';
-			rangeSelected = 2;
-			document.getElementById('towerinfo').innerHTML = 'Flame tower selected' + "<br />Cost: 5<br>Range: " + rangeSelected  + "<br />Damage: 10";
 			startBuildMode();
 		});
 
 		document.getElementById('freeze-tower').addEventListener('click', function() {
-			typeSelectedBuild = 'freeze-tower';
-			rangeSelected = 3;
-			document.getElementById('towerinfo').innerHTML = 'Freeze tower selected'+"<br />Cost: 5<br>Range: " + rangeSelected  + "<br />Damage: 10";
 			startBuildMode();
 		});
 
 		document.getElementById('anti-air-tower').addEventListener('click', function() {
-			typeSelectedBuild = 'anti-air-tower';
-			rangeSelected = 5;
-			document.getElementById('towerinfo').innerHTML = 'Anti-Air tower selected' + "<br />Cost: 5<br>Range: " + rangeSelected  + "<br />Damage: 10";
 			startBuildMode();
 		});
 
@@ -792,10 +870,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			document.getElementById('towerinfo').innerHTML = "";
 			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
 			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, spd:200, dir:'r'}));
-
-			//console.log(creeps[creeps.length - 1].type);
-
-			//console.log('Creep button pressed!');
 		});
 	}
 
@@ -819,6 +893,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// initalize game size
 		rows = 15;
 		cols = 15;
+
+		// initalize income
+		income = 0;
 
 		// initalize the main pathfinding array
 		pathArray = [];
