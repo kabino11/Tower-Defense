@@ -676,7 +676,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		if(creeps.length == 0) {  // clear gameinfo if creep array is empty
 			document.getElementById('gameinfo').innerHTML = '';
 		}
-		
+
 		graphics.clear();
 
 		var mousePos = mouse.getMouse();
