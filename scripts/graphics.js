@@ -5,6 +5,9 @@ Game.graphics = (function() {
 	var canvas = document.getElementById('gameplay-canvas'),
 		context = canvas.getContext('2d');
 
+	var canvas2 = document.getElementById('scoring-canvas'),
+		context2 = canvas2.getContext('2d');
+
 	var destructionParticles = ParticleSystem( {
 			image : 'textures/bigspark.png',
 			speed: {mean: 50, stdev: 10},
@@ -383,6 +386,24 @@ Game.graphics = (function() {
 		context.restore();
 	}
 
+	function drawScore(score) {
+		context2.save();
+
+		context2.restore();
+	}
+
+	function drawMoney(income) {
+		context2.save();
+
+		context2.restore();
+	}
+
+	function drawLives(lives) {
+		context2.save();
+
+		context2.restore();
+	}
+
 	// generic draw text amd draw image functions
 	function drawText(spec) {
 		context.save();
@@ -420,6 +441,9 @@ Game.graphics = (function() {
 		drawGrid: drawGrid,
 		highlightSquare: highlightSquare,
 		highlightRange: highlightRange,
+		drawScore: drawScore,
+		drawMoney: drawMoney,
+		drawLives: drawLives,
 		drawText: drawText,
 		drawImage: drawImage,
 		spawnParticle: spawnParticle,

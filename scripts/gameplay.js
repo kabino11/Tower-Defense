@@ -70,7 +70,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 					// if so shoot at it
 					if(Math.abs(spec.angle - fireAngle) < .1) {
 						spec.shotTimer = spec.timeBetweenShots;
-						bullets.push(Bullet({x:xPos, y:yPos, r:5, spd:750, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+						bullets.push(Bullet({x:xPos, y:yPos, r:5, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
 						return;
 					}
 				}
@@ -189,11 +189,17 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			get totalHP() { return spec.totalHP; },
 			get HP() { return spec.HP; },
 
+			get reward() { return spec.reward; },
+
 			get numFrames() { return spec.numFrames; },
 			get frameNo() { return spec.frameNo; },
 
 			get idxNo() { return spec.idxNo; }
 		};
+
+		if(spec.spd == undefined) {
+			spec.spd = 200;
+		}
 
 		if(spec.frameNo == undefined) {
 			spec.frameNo = 0;
@@ -204,6 +210,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 		if(spec.HP == undefined) {
 			spec.HP = spec.totalHP;
+		}
+		if(spec.reward == undefined) {
+			spec.reward = 5;
 		}
 
 		var nextFrame = 0.0;
@@ -307,6 +316,14 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		return that;
 	}
 
+	function SnakeCreep(spec) {
+		var that = Creep(spec);
+
+		spec.spd = 300;
+
+		return that;
+	}
+
 	function CreepFactory(spec) {
 		var that;
 
@@ -315,6 +332,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 		else if(spec.type == 'armored-creep') {
 			that = ArmoredCreep(spec);
+		}
+		else if(spec.type == 'snake-creep') {
+			that = SnakeCreep(spec);
 		}
 		else {
 			that = Creep(spec);
@@ -502,9 +522,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 				towerSelected = towerUnderMouse;
 				document.getElementById('delete-tower').classList.add('show');
+				var type = towers[towerSelected].type.replace(/-/g, ' ')
+				type = type.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+				document.getElementById('towerinfo').innerHTML = type + "<br />Value: " + towerCosts[towers[towerSelected].type] / 2 + "<br>Range: " + towers[towerSelected].r  + "<br />Damage: " + towers[towerSelected].damage;
 			}
 			else {
 				document.getElementById('delete-tower').classList.remove('show');
+				document.getElementById('towerinfo').innerHTML = '';
 			}
 		}
 	}
@@ -529,6 +553,10 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			//printPaths();
 
 			//console.log(typeSelectedBuild + ' tower built');
+
+			// Decrement from user income
+			income -= towerCosts[typeSelectedBuild];
+			console.log(income);
 
 			// turn off build mode, deselect build option, and remove the event listener for this function
 			build_mode = false;
@@ -838,6 +866,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				towers.splice(towerSelected, 1);
 				towerSelected = undefined;
 				blobPath(pathArray);
+				document.getElementById('towerinfo').innerHTML = '';
 				document.getElementById('delete-tower').classList.remove('show');
 			}
 		});
@@ -869,7 +898,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			document.getElementById('towerinfo').innerHTML = "";
 			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
-			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, spd:200, dir:'r'}));
+			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, dir:'r'}));
 		});
 	}
 
@@ -891,11 +920,11 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		validPlace = true;
 
 		// initalize game size
-		rows = 15;
+		rows = 14;
 		cols = 15;
 
 		// initalize income
-		income = 0;
+		income = 100;
 
 		// initalize the main pathfinding array
 		pathArray = [];
