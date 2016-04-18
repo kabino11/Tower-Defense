@@ -366,6 +366,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		return that;
 	}
 
+	// Define variables for game state
 	// used for input
 	var keyboard = input.Keyboard();
 	var mouse = input.Mouse();
