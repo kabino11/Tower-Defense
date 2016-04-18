@@ -676,6 +676,10 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			if(creeps[i].x > canvasRect.width) {
 				//console.log('Creep deleted!');
 				creeps.splice(i, 1);
+				lives--;
+				if(lives < 0) {
+					lives = 0;
+				}
 			}
 		}
 
