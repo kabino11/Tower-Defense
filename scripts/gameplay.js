@@ -395,8 +395,10 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	var creeps;
 	var bullets;
 
-	// keep track of player income
+	// keep track of player data
 	var income;
+	var score;
+	var lives;
 
 	// keep track of tower under mouse cursor and bool for keeping track of pathfinding state
 	var towerUnderMouse;
@@ -801,6 +803,11 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		// and then draw all of our particles
 		graphics.drawParticles();
+
+		// and then draw our UI
+		graphics.drawMoney(income);
+		graphics.drawLives(lives);
+		graphics.drawScore(score);
 	}
 
 	// standard functions for other classes to interact with
@@ -925,6 +932,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		// initalize income
 		income = 100;
+		score = 0;
+		lives = 0;
+
 
 		// initalize the main pathfinding array
 		pathArray = [];
