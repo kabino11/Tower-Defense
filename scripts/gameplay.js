@@ -938,7 +938,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	// initalizes game state and starts game loop
 	function run() {
 		//Playing background music.
-		document.getElementById('bg-music').play();
+		//document.getElementById('bg-music').play();
 
 		// register all our keys
 		keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, quitGame);
