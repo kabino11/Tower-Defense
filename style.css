@@ -1,6 +1,6 @@
 body {
-	width: 1300px;
-	margin: auto;
+	width: 80%;
+	margin: 0 auto;
 	background: url("./textures/backgrounds/grass.jpg");
 	background-size: cover;
 	font-family: fantasy;
@@ -194,6 +194,16 @@ canvas {
 
 .tower-image p{
 	margin : 0;
+}
+
+#left-menu{
+	width: 200px;
+  float: left;
+  padding-top: 15px;
+  padding-bottom: 1px;
+  text-align: center;
+  font-size: 25px;
+
 }
 
 #canvas-div{
