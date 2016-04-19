@@ -217,6 +217,14 @@ canvas {
 	overflow-y: scroll;
 }
 
+#gameplay-canvas{
+	border: 5px dotted black;
+}
+
+#scoring-canvas{
+	border: 5px dotted white;
+}
+
 
 /* * * * * * * * * * * * * * * * * * * * *\
   CSShake :: shake-little
