@@ -186,6 +186,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			get spd() { return spec.spd; },
 			get dir() { return spec.dir; },
 
+			get goalDir() { return spec.goalDir; },
+
 			get totalHP() { return spec.totalHP; },
 			get HP() { return spec.HP; },
 
@@ -199,6 +201,10 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		if(spec.spd == undefined) {
 			spec.spd = 200;
+		}
+
+		if(spec.goalDir == undefined) {
+			spec.goalDir = 'r';
 		}
 
 		if(spec.frameNo == undefined) {
@@ -394,7 +400,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	// keeps track of towers and creeps in game
 	var towers;
 	var creeps;
-	var creepsVertical;
 	var bullets;
 
 	// keep track of player data
@@ -435,7 +440,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 	// runs basic blob algorithm on 2d array 'data' input.
 	// also optionally takes an x and y argument for one additional obstacle in pathfinding (useful for tower placement validity)
-	function blobPath(data, x, y) {
+	function blobPath(data, dir, x, y) {
 		// initalize data array
 		for(var i = 0; i < data.length; i++) {
 			for(var j = 0; j < data[i].length; j++) {
@@ -444,9 +449,17 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 
 		// create objective markers to path to
-		for(i = 0; i < rows; i++) {
-			data[i][data[i].length - 1] = 'r';
+		if(dir == 'r') {
+			for(i = 0; i < rows; i++) {
+				data[i][data[i].length - 1] = 'r';
+			}
 		}
+		else if(dir == 'd') {
+			for(i = 0; i < cols; i++) {
+				data[data.length - 1][i] = 'd';
+			}
+		}
+		
 
 		// then add in towers based on tower coordinates
 		for(i = 0; i < towers.length; i++) {
@@ -555,8 +568,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			towers.push(TowerFactory({type:typeSelectedBuild, x:xLoc, y:yLoc, r:rangeSelected, dir:'r'}));
 
 			// update pathfinding for creeps
-			blobPath(pathArray);
-			blobPath(pathArrayVertical);
+			blobPath(pathArray, 'r');
+			blobPath(pathArrayVertical, 'd');
 			//printPaths();
 
 			//console.log(typeSelectedBuild + ' tower built');
@@ -654,6 +667,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			if(build_mode && towerUnderMouse == undefined) {
 				// create temporary array and fill it to game dimensions
 				var testArray = [];
+				var testArray2 = [];
 
 				for(i = 0; i < rows; i++) {
 					var current = [];
@@ -663,11 +677,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 					}
 
 					testArray.push(current);
+					testArray2.push(current);
 				}
 
 				// do pathing with temporary array and proposed coordinates.  Then set validPlace accordingly if there isn't a path
-				blobPath(testArray, xPos, yPos);
-				if(testArray[6][0] == ' ' || testArray[6][0] == 'N') {
+				blobPath(testArray, 'r', xPos, yPos);
+				blobPath(testArray2, 'd', xPos, yPos);
+				if(testArray[6][0] == ' ' || testArray[6][0] == 'N' || testArray2[0][6] == ' ' || testArray2[0][6] == 'N') {
 					validPlace = false;
 				}
 			}
@@ -675,22 +691,20 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		// now update the creeps in the array
 		for(i = creeps.length - 1; i >= 0; i--) {
-			creeps[i].update(timePassed, pathArray);
-			if(creeps[i].x > canvasRect.width) {
+			if(creeps[i].goalDir == 'r') {
+				creeps[i].update(timePassed, pathArray);
+			}
+			else if(creeps[i].goalDir == 'd') {
+				creeps[i].update(timePassed, pathArrayVertical);
+			}
+
+			if(creeps[i].x > canvasRect.width || creeps[i].y > canvasRect.height) {
 				//console.log('Creep deleted!');
 				creeps.splice(i, 1);
 				lives--;
 				if(lives < 0) {
 					lives = 0;
 				}
-			}
-		}
-
-		for(i = creepsVertical.length - 1; i >= 0; i--) {
-			creepsVertical[i].update(timePassed, pathArrayVertical);
-			if(creepsVertical[i].y > canvasRect.height) {
-				//console.log('Creep deleted!');
-				creepsVertical.splice(i, 1);
 			}
 		}
 
@@ -814,11 +828,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			graphics.drawCreep(creeps[i]);
 		}
 
-		// draw Vertical Creeps
-		for(var i = 0; i < creepsVertical.length; i++) {
-			graphics.drawCreep(creepsVertical[i]);
-		}
-
 		// now draw all of the bullets
 		for(i = 0; i < bullets.length; i++) {
 			graphics.drawBullet(bullets[i]);
@@ -930,8 +939,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			document.getElementById('towerinfo').innerHTML = "";
 			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
-			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, dir:'r'}));
-			creepsVertical.push(CreepFactory({type:type, x:6 * xDist + 4, y:0, w:xDist - 8, h:yDist - 8, dir:'d'}));
+			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, dir:'r', goalDir:'r'}));
+			creeps.push(CreepFactory({type:type, x:6 * xDist + 4, y:0, w:xDist - 8, h:yDist - 8, dir:'d', goalDir:'d'}));
 		});
 	}
 
@@ -948,7 +957,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// initalize our towers and creeps arrays
 		towers = [];
 		creeps = [];
-		creepsVertical = [];
 		bullets = [];
 
 		// initalize tower selection and placement variables
