@@ -393,6 +393,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	// keeps track of towers and creeps in game
 	var towers;
 	var creeps;
+	var creepsVertical;
 	var bullets;
 
 	// keep track of player data
@@ -409,6 +410,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 	// 2d array for pathfinding
 	var pathArray;
+	var pathArrayVertical;
 
 	// variables for enabling build mode as well as turret range and type to build
 	var typeSelectedBuild;
@@ -553,6 +555,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			// update pathfinding for creeps
 			blobPath(pathArray);
+			blobPath(pathArrayVertical);
 			//printPaths();
 
 			//console.log(typeSelectedBuild + ' tower built');
@@ -672,9 +675,18 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// now update the creeps in the array
 		for(i = creeps.length - 1; i >= 0; i--) {
 			creeps[i].update(timePassed, pathArray);
+			creepsVertical[i].update(timePassed, pathArrayVertical);
 			if(creeps[i].x > canvasRect.width) {
 				//console.log('Creep deleted!');
 				creeps.splice(i, 1);
+			}
+		}
+
+		for(i = creepsVertical.length - 1; i >= 0; i--) {
+			creepsVertical[i].update(timePassed, pathArrayVertical);
+			if(creepsVertical[i].x > canvasRect.width) {
+				//console.log('Creep deleted!');
+				creepsVertical.splice(i, 1);
 			}
 		}
 
@@ -793,8 +805,13 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 
 		// now draw all existing creeps
-		for(i = 0; i < creeps.length; i++) {
+		for(var i = 0; i < creeps.length; i++) {
 			graphics.drawCreep(creeps[i]);
+		}
+
+		// draw Vertical Creeps
+		for(var i = 0; i < creepsVertical.length; i++) {
+			graphics.drawCreep(creepsVertical[i]);
 		}
 
 		// now draw all of the bullets
@@ -875,6 +892,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				towers.splice(towerSelected, 1);
 				towerSelected = undefined;
 				blobPath(pathArray);
+				blobPath(pathArrayVertical);
 				document.getElementById('towerinfo').innerHTML = '';
 				document.getElementById('delete-tower').classList.remove('show');
 			}
@@ -908,6 +926,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			document.getElementById('towerinfo').innerHTML = "";
 			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
 			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, dir:'r'}));
+			creepsVertical.push(CreepFactory({type:type, x:5 * xDist + 4, y:0, w:xDist - 8, h:yDist - 8, dir:'d'}));
 		});
 	}
 
@@ -921,6 +940,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		// initalize our towers and creeps arrays
 		towers = [];
 		creeps = [];
+		creepsVertical = [];
 		bullets = [];
 
 		// initalize tower selection and placement variables
@@ -950,7 +970,23 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			pathArray.push(row);
 		}
+
+		//this is the path Array for vertical waves.
+		pathArrayVertical = [];
+		for(var i = 0; i < cols; i++) {
+			var row = [];
+
+			for(var j = 0; j < rows; j++) {
+				row.push(' ');
+			}
+
+			pathArrayVertical.push(row);
+		}
+
+		//Calling blobPath() for horizontal waves.
 		blobPath(pathArray);
+		//calling blobPath() for vertical waves.
+		blobPath(pathArrayVertical);
 
 		// initalize game running variable and start the loop
 		running = true;
