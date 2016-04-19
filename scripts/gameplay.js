@@ -192,6 +192,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			get HP() { return spec.HP; },
 
 			get reward() { return spec.reward; },
+			get score() { return spec.score; },
 
 			get numFrames() { return spec.numFrames; },
 			get frameNo() { return spec.frameNo; },
@@ -219,6 +220,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 		if(spec.reward == undefined) {
 			spec.reward = 5;
+		}
+		if(spec.score == undefined) {
+			spec.score = 5;
 		}
 
 		var nextFrame = 0.0;
@@ -407,6 +411,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	var score;
 	var lives;
 	var wave;
+
+	var gameOver;
 
 	// keep track of tower under mouse cursor and bool for keeping track of pathfinding state
 	var towerUnderMouse;
@@ -622,7 +628,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		keyboard.update(currentTime - prevTime);
 
-		update(currentTime - prevTime);
+		if(gameOver == false) {
+			update(currentTime - prevTime);
+		}
 
 		//then update particles (done independently of game update so that they can move even on the game over screen)
 		graphics.updateParticles(currentTime - prevTime);
@@ -780,8 +788,15 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 				for(j = 0; j < 20; j++) { // spawn death particles
 					graphics.spawnParticle({x:creeps[i].x + creeps[i].w / 2, y:creeps[i].y + creeps[i].h / 2});
 				}
+				income += creeps[i].reward;
+				score += creeps[i].score;
 				creeps.splice(i, 1);
 			}
+		}
+
+		if(lives <= 0) {
+			lives = 0;
+			gameOver = true;
 		}
 	}
 
@@ -793,43 +808,48 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		graphics.clear();
 
-		var mousePos = mouse.getMouse();
-
-		// if we're building we want to draw a grid, show a preview sprite of a tower under the mouse cursor, draw a range indicator, and draw a validity indicator
-		if(build_mode) {
-			graphics.drawGrid({rows: rows, cols: cols});
-			var canvasRect = mouse.getCanvasBounds();
+		if(!gameOver) {
 			var mousePos = mouse.getMouse();
 
-			if(mouse.inCanvas()) {
-				graphics.highlightRange({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, r:rangeSelected});
-				graphics.highlightSquare({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, validPlace:validPlace});
-				graphics.drawTower({x:mousePos.x, y:mousePos.y, type:typeSelectedBuild, dir:'l', rows:rows, cols:cols});
+			// if we're building we want to draw a grid, show a preview sprite of a tower under the mouse cursor, draw a range indicator, and draw a validity indicator
+			if(build_mode) {
+				graphics.drawGrid({rows: rows, cols: cols});
+				var canvasRect = mouse.getCanvasBounds();
+				var mousePos = mouse.getMouse();
+
+				if(mouse.inCanvas()) {
+					graphics.highlightRange({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, r:rangeSelected});
+					graphics.highlightSquare({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, validPlace:validPlace});
+					graphics.drawTower({x:mousePos.x, y:mousePos.y, type:typeSelectedBuild, dir:'l', rows:rows, cols:cols});
+				}
+			}
+			else if(towerUnderMouse != undefined) {  //otherwise show data for tower underneath the mouse
+				graphics.highlightRange({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, r:towers[towerUnderMouse].r});
+				graphics.highlightSquare({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, validPlace:true});
+			}
+
+			if(towerSelected != undefined) {
+				graphics.highlightRange({row:towers[towerSelected].x, col:towers[towerSelected].y, rows:rows, cols:cols, r:towers[towerSelected].r});
+				graphics.highlightSquare({row:towers[towerSelected].x, col:towers[towerSelected].y, rows:rows, cols:cols, r:towers[towerSelected].r, validPlace:true});
+			}
+
+			// now draw the currently placed towers
+			for(var i = 0; i < towers.length; i++) {
+				graphics.drawTower({row:towers[i].x, col:towers[i].y, type:towers[i].type, placing:false, dir:towers[i].dir, angle:towers[i].angle, rows:rows, cols:cols});
+			}
+
+			// now draw all existing creeps
+			for(var i = 0; i < creeps.length; i++) {
+				graphics.drawCreep(creeps[i]);
+			}
+
+			// now draw all of the bullets
+			for(i = 0; i < bullets.length; i++) {
+				graphics.drawBullet(bullets[i]);
 			}
 		}
-		else if(towerUnderMouse != undefined) {  //otherwise show data for tower underneath the mouse
-			graphics.highlightRange({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, r:towers[towerUnderMouse].r});
-			graphics.highlightSquare({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, validPlace:true});
-		}
-
-		if(towerSelected != undefined) {
-			graphics.highlightRange({row:towers[towerSelected].x, col:towers[towerSelected].y, rows:rows, cols:cols, r:towers[towerSelected].r});
-			graphics.highlightSquare({row:towers[towerSelected].x, col:towers[towerSelected].y, rows:rows, cols:cols, r:towers[towerSelected].r, validPlace:true});
-		}
-
-		// now draw the currently placed towers
-		for(var i = 0; i < towers.length; i++) {
-			graphics.drawTower({row:towers[i].x, col:towers[i].y, type:towers[i].type, placing:false, dir:towers[i].dir, angle:towers[i].angle, rows:rows, cols:cols});
-		}
-
-		// now draw all existing creeps
-		for(var i = 0; i < creeps.length; i++) {
-			graphics.drawCreep(creeps[i]);
-		}
-
-		// now draw all of the bullets
-		for(i = 0; i < bullets.length; i++) {
-			graphics.drawBullet(bullets[i]);
+		else {
+			graphics.drawGameOver();
 		}
 
 		// and then draw all of our particles
@@ -985,6 +1005,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		score = 0;
 		lives = 20;
 		wave = 0;
+
+		gameOver = false;
 
 
 		// initalize the main pathfinding array
