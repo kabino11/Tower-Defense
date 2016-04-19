@@ -387,6 +387,18 @@ Game.graphics = (function() {
 		context.restore();
 	}
 
+	function drawGameOver() {
+		context.save();
+
+		context.beginPath();
+
+		context.font = '100px fantasy';
+		context.fillStyle = 'black';
+		context.fillText('GAME OVER', canvas.width / 2 - 300, canvas.height / 3);
+
+		context.restore();
+	}
+
 	function drawScore(score) {
 		context2.save();
 		context2.font = "30px fantasy";
@@ -456,6 +468,7 @@ Game.graphics = (function() {
 		drawGrid: drawGrid,
 		highlightSquare: highlightSquare,
 		highlightRange: highlightRange,
+		drawGameOver: drawGameOver,
 		drawScore: drawScore,
 		drawMoney: drawMoney,
 		drawLives: drawLives,
