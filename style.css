@@ -218,11 +218,11 @@ canvas {
 }
 
 #gameplay-canvas{
-	border: 5px dotted black;
+	border: 5px inset burlywood;
 }
 
 #scoring-canvas{
-	border: 5px dotted white;
+	border: 5px inset white;
 }
 
 

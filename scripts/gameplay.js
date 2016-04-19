@@ -748,6 +748,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			// if we hit someone indicate that we did, deal damage, and then break out because each bullet deals damage once
 			for(j = 0; j < targets.length; j++) {
 				if(collides(targets[j], bullets[i])) {
+					document.getElementById('creep-hit').play();
 					creeps[targets[j].idxNo].giveDamage(bullets[i].dmg);
 					hit = true;
 					break;
@@ -936,6 +937,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 	// initalizes game state and starts game loop
 	function run() {
+		//Playing background music.
+		document.getElementById('bg-music').play();
+
 		// register all our keys
 		keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, quitGame);
 
