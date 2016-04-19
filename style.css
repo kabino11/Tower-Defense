@@ -197,8 +197,13 @@ canvas {
 }
 
 #left-menu{
-	width:200px;
-	float: left;
+	width: 200px;
+  float: left;
+  padding-top: 15px;
+  padding-bottom: 1px;
+  text-align: center;
+  font-size: 25px;
+
 }
 
 #canvas-div{
