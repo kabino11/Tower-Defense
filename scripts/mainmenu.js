@@ -13,6 +13,10 @@ Game.screens['main-menu'] = (function(game) {
 		document.getElementById('main->about').addEventListener('click', function() {
 			game.showScreen('about');
 		});
+
+		document.getElementById('main->credits').addEventListener('click', function() {
+			game.showScreen('credits');
+		});
 	}
 
 	function run() {
