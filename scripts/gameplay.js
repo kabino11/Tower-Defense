@@ -460,7 +460,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			}
 		}
 		
-
 		// then add in towers based on tower coordinates
 		for(i = 0; i < towers.length; i++) {
 			data[towers[i].y][towers[i].x] = 'N';
@@ -942,12 +941,25 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, dir:'r', goalDir:'r'}));
 			creeps.push(CreepFactory({type:type, x:6 * xDist + 4, y:0, w:xDist - 8, h:yDist - 8, dir:'d', goalDir:'d'}));
 		});
+
+			//Muting the the audio
+			document.getElementById('mute_unmute_button').addEventListener('click', function(){
+				var path = document.getElementById("mute_unmute").src;
+
+				if(path.substring(path.lastIndexOf('/')) === "/unmute.png"){
+					document.getElementById("mute_unmute").src = "textures/mute.png";
+					document.getElementById('bg-music').muted = true;
+				}else{
+					document.getElementById("mute_unmute").src = "textures/unmute.png";
+					document.getElementById('bg-music').muted = false;
+				}
+			});
 	}
 
 	// initalizes game state and starts game loop
 	function run() {
 		//Playing background music.
-		//document.getElementById('bg-music').play();
+		document.getElementById('bg-music').play();
 
 		// register all our keys
 		keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, quitGame);
