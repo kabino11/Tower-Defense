@@ -461,7 +461,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			}
 		}
 		else if(dir == 'd') {
-			for(i = 0; i < cols; i++) {
+			for(i = 0; i < data[data.length - 1].length; i++) {
 				data[data.length - 1][i] = 'd';
 			}
 		}
@@ -535,6 +535,18 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			console.log(rowOut);
 		}
+
+		console.log("Now for vertical");
+
+		for(var i = 0; i < pathArrayVertical.length; i++) {
+			var rowOut = '';
+
+			for(var j = 0; j < pathArrayVertical[i].length; j++) {
+				rowOut += pathArrayVertical[i][j] + ' ';
+			}
+
+			console.log(rowOut);
+		}
 	}
 
 	// Functions invoked via mouse listeners
@@ -576,7 +588,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			// update pathfinding for creeps
 			blobPath(pathArray, 'r');
 			blobPath(pathArrayVertical, 'd');
-			//printPaths();
+			printPaths();
 
 			//console.log(typeSelectedBuild + ' tower built');
 
@@ -925,8 +937,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			if(towerSelected != undefined) {
 				towers.splice(towerSelected, 1);
 				towerSelected = undefined;
-				blobPath(pathArray);
-				blobPath(pathArrayVertical);
+				blobPath(pathArray, 'r');
+				blobPath(pathArrayVertical, 'd');
 				document.getElementById('towerinfo').innerHTML = '';
 				document.getElementById('delete-tower').classList.remove('show');
 			}
@@ -936,8 +948,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		document.getElementById('start-wave').addEventListener('click', function() {
 			var rect = mouse.getCanvasBounds();
 
-			var xDist = rect.width / cols;
-			var yDist = rect.height / rows;
+			var colDist = rect.width / cols;
+			var rowDist = rect.height / rows;
 
 			var select = Math.floor(Math.random() * 4);
 			var type;
@@ -959,8 +971,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			document.getElementById('towerinfo').innerHTML = "";
 			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
-			creeps.push(CreepFactory({type:type, x:0, y:6 * yDist + 4, w:xDist - 8, h:yDist - 8, dir:'r', goalDir:'r'}));
-			creeps.push(CreepFactory({type:type, x:6 * xDist + 4, y:0, w:xDist - 8, h:yDist - 8, dir:'d', goalDir:'d'}));
+			creeps.push(CreepFactory({type:type, x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, dir:'r', goalDir:'r'}));
+			creeps.push(CreepFactory({type:type, x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, dir:'d', goalDir:'d'}));
 		});
 	}
 
@@ -996,7 +1008,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		gameOver = false;
 
-
 		// initalize the main pathfinding array
 		pathArray = [];
 		for(var i = 0; i < rows; i++) {
@@ -1022,9 +1033,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 
 		//Calling blobPath() for horizontal waves.
-		blobPath(pathArray);
+		blobPath(pathArray, 'r');
 		//calling blobPath() for vertical waves.
-		blobPath(pathArrayVertical);
+		blobPath(pathArrayVertical, 'd');
 
 		// initalize game running variable and start the loop
 		running = true;
