@@ -254,7 +254,6 @@ Game.graphics = (function() {
 		// draw tower direction angle for bugfixing, no longer used
 		//xPos += xDist/2;
 		//yPos += xDist/2;
-
 		//context.beginPath();
 		//context.lineWidth = 2;
 		//context.strokeStyle = 'black';
@@ -266,19 +265,16 @@ Game.graphics = (function() {
 	}
 
 	function drawBullet(spec) {
+
 		context.save();
 
 		var image = new Image();
-
-		image.onload = function(){
-
-
-		};
-
 		image.src = "textures/shellshot.png";
 
-		context.drawImage(image, 0, 0, 9, 9,spec.x, spec.y, spec.r * 2, spec.r * 2);
+		context.translate(spec.x, spec.y);
+		context.rotate(spec.angle);
 
+		context.drawImage(image, 0, 0, 9, 9, -spec.r, -spec.r, spec.r * 2.5, spec.r * 2.5);
 		context.restore();
 	}
 
