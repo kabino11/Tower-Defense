@@ -268,10 +268,16 @@ Game.graphics = (function() {
 	function drawBullet(spec) {
 		context.save();
 
-		context.fillStyle = 'brown';
-		context.beginPath();
-		context.arc(spec.x, spec.y, spec.r, 0, 2 * Math.PI);
-		context.fill();
+		var image = new Image();
+
+		image.onload = function(){
+
+
+		};
+
+		image.src = "textures/shellshot.png";
+
+		context.drawImage(image, 0, 0, 9, 9,spec.x, spec.y, spec.r * 2, spec.r * 2);
 
 		context.restore();
 	}
