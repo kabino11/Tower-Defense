@@ -166,11 +166,32 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		return that;
 	}
 
+	function FreezeTower(spec) {
+		var that = Tower(spec);
+
+		if(spec.slowToGive == undefined) {
+			spec.slowToGive = .1;
+		}
+
+		that.shoot = function(targets, xDist, yDist, timePassed) {
+			for(var i = 0; i < targets.length; i++) {
+				if(targets[i].type != 'air-creep') {
+					targets[i].giveSlow(spec.slowToGive);
+				}
+			}
+		};
+
+		return that;
+	}
+
 	function TowerFactory(spec) {
 		var that;
 
 		if(spec.type === 'flame-tower') {
 			that = FlameTower(spec);
+		}
+		else if(spec.type === 'freeze-tower') {
+			that = FreezeTower(spec);
 		}
 		else {
 			that = Tower(spec);
@@ -194,6 +215,8 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			get totalHP() { return spec.totalHP; },
 			get HP() { return spec.HP; },
+
+			get slowTime() { return spec.slowTime; },
 
 			get reward() { return spec.reward; },
 			get score() { return spec.score; },
@@ -221,6 +244,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 		if(spec.HP == undefined) {
 			spec.HP = spec.totalHP;
+		}
+		if(spec.slowTime == undefined) {
+			spec.slowTime = 0;
 		}
 		if(spec.reward == undefined) {
 			spec.reward = 5;
@@ -250,22 +276,26 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			}
 
 			if(spec.dir == 'r') {
-				spec.x += spec.spd * (timePassed / 1000);
+				spec.x += spec.spd / (spec.slowTime > 0 ? 2 : 1) * (timePassed / 1000);
 			}
 			else if(spec.dir == 'l') {
-				spec.x -= spec.spd * (timePassed / 1000);
+				spec.x -= spec.spd / (spec.slowTime > 0 ? 2 : 1) * (timePassed / 1000);
 			}
 			else if(spec.dir == 'u') {
-				spec.y -= spec.spd * (timePassed / 1000);
+				spec.y -= spec.spd / (spec.slowTime > 0 ? 2 : 1) * (timePassed / 1000);
 			}
 			else if(spec.dir == 'd') {
-				spec.y += spec.spd * (timePassed / 1000);
+				spec.y += spec.spd / (spec.slowTime > 0 ? 2 : 1) * (timePassed / 1000);
 			}
 			else {
 				spec.x += spec.spd * (timePassed / 1000);
 			}
 
-			nextFrame += timePassed / 1000;
+			nextFrame += timePassed / (spec.slowTime > 0 ? 2 : 1) / 1000;
+
+			if(spec.slowTime > 0) {
+				spec.slowTime -= timePassed / 1000;
+			}
 
 			while(nextFrame > .1) {
 				nextFrame -= .1;
@@ -279,7 +309,14 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			if(spec.HP < 0) {
 				spec.HP = 0;
 			}
-		}
+		};
+
+		that.giveSlow = function(time) {
+			spec.slowTime += time;
+			if(spec.slowTime > .5) {
+				spec.slowTime = .5;
+			}
+		};
 
 		that.setIdxNo = function(idxIn) {
 			spec.idxNo = idxIn;
