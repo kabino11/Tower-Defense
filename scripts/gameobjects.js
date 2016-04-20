@@ -170,7 +170,7 @@ Game.gameObjects = (function(mouse) {
 		that.showInfo = function() {
 			var type = spec.type.replace(/-/g, ' ')
 			type = type.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-			document.getElementById('towerinfo').innerHTML = type + "<br />Sell Value: " + Math.floor(spec.moneyInvested / 2) + "<br/>Upgrade Cost: " + spec.moneyInvested + "<br>Range: " + spec.r  + "<br />Damage: " + spec.damage;
+			document.getElementById('towerinfo').innerHTML = type + "<br/>Level: " + spec.level + "<br />Sell Value: " + Math.floor(spec.moneyInvested / 2) + "<br/>Upgrade Cost: " + spec.moneyInvested + "<br>Range: " + spec.r  + "<br />Damage: " + spec.damage;
 		};
 
 		return that;
@@ -198,6 +198,19 @@ Game.gameObjects = (function(mouse) {
 				}
 			}
 		};
+
+		that.showInfo = function() {
+			var type = spec.type.replace(/-/g, ' ')
+			type = type.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+			document.getElementById('towerinfo').innerHTML = type + "<br/>Level: " + spec.level + "<br />Sell Value: " + Math.floor(spec.moneyInvested / 2) + "<br/>Upgrade Cost: " + spec.moneyInvested + "<br>Range: " + spec.r  + "<br />Freeze/sec: " + spec.slowToGive;
+		};
+
+		that.levelUp = function() {
+			spec.level++;
+
+			spec.slowToGive += .05;
+			spec.moneyInvested *= 2;
+		}
 
 		return that;
 	}

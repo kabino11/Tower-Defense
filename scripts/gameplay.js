@@ -597,13 +597,22 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 		});
 
 		document.getElementById('upgrade-tower').addEventListener('click', function() {
-			if(towerSelected != undefined && income >= towers[towerSelected].moneyInvested) {
+			if(towerSelected != undefined && income >= towers[towerSelected].moneyInvested && towers[towerSelected].level < 3) {
 				income -= towers[towerSelected].moneyInvested;
 				towers[towerSelected].levelUp();
 				towers[towerSelected].showInfo();
 			}
 			else {
-				document.getElementById('towerinfo').innerHTML = "Can't afford that";
+				if(towers[towerSelected].level >= 3) {
+					document.getElementById('towerinfo').innerHTML = "Tower is at MAX level.";
+				}
+				else if(income < towers[towerSelected].moneyInvested) {
+					document.getElementById('towerinfo').innerHTML = "Can't afford that";
+				}
+				else {
+					document.getElementById('towerinfo').innerHTML = "ERROR";
+				}
+				
 				towerSelected = undefined;
 			}
 		});
