@@ -318,13 +318,15 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 
 				for(i = 0; i < rows; i++) {
 					var current = [];
+					var current2 = [];
 
 					for(var j = 0; j < cols; j++) {
 						current.push(' ');
+						current2.push(' ');
 					}
 
 					testArray.push(current);
-					testArray2.push(current);
+					testArray2.push(current2);
 				}
 
 				// do pathing with temporary array and proposed coordinates.  Then set validPlace accordingly if there isn't a path
@@ -620,6 +622,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 		document.getElementById('delete-tower').addEventListener('click', function() {
 			console.log('delete-tower called! ' + towerSelected);
 			if(towerSelected != undefined) {
+				income += Math.floor(towers[towerSelected].moneyInvested / 2);
 				towers.splice(towerSelected, 1);
 				towerSelected = undefined;
 				blobPath(pathArray, 'r');
