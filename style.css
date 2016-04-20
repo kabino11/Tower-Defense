@@ -92,7 +92,9 @@ h1 {
 }
 
 .button-hidden.show {
+	float: left;
   display: block;
+  margin-left: 25px;
 }
 
 #tower-buttons {
