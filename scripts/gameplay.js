@@ -2,6 +2,17 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 	'use strict';
 
 	// Define variables for game state
+
+	// Game information variables
+	// base tower costs variable
+	var towerCosts = {
+		'cannon-tower': 5,
+		'flame-tower': 10,
+		'freeze-tower': 10,
+		'anti-air-tower': 15
+	};
+	var creepTypes = ['normal-creep', 'armored-creep', 'snake-creep', 'air-creep'];
+
 	// used for input
 	var keyboard = input.Keyboard();
 	var mouse = input.Mouse();
@@ -14,14 +25,6 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 	var currentTime;
 	var currentFrame = undefined;
 
-	//base tower costs variable
-	var towerCosts = {
-		'cannon-tower': 5,
-		'flame-tower': 10,
-		'freeze-tower': 10,
-		'anti-air-tower': 15
-	};
-
 	// actual game variables to use
 	var rows;
 	var cols;
@@ -31,6 +34,8 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 	var creeps;
 	var bullets;
 	var missiles;
+
+	var creepSpawns;
 
 	// keep track of player data
 	var income;
@@ -46,7 +51,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 
 	var towerSelected;
 
-	// 2d array for pathfinding
+	// 2d arrays for pathfinding
 	var pathArray;
 	var pathArrayVertical;
 
@@ -335,6 +340,20 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 				if(testArray[6][0] == ' ' || testArray[6][0] == 'N' || testArray2[0][6] == ' ' || testArray2[0][6] == 'N') {
 					validPlace = false;
 				}
+			}
+		}
+
+		// now see if we should spawn creeps
+		var spawnTime = timePassed / 1000;
+		while(spawnTime > 0 && creepSpawns.length > 0) {
+			if(spawnTime >= creepSpawns[0].time) {
+				spawnTime -= creepSpawns[0].time;
+				creeps.push(objects.CreepFactory(creepSpawns[0]));
+				creepSpawns.splice(0, 1);
+			}
+			else {
+				creepSpawns[0].time -= spawnTime;
+				spawnTime = 0;
 			}
 		}
 
@@ -635,33 +654,27 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 
 		// set button to spawn creeps
 		document.getElementById('start-wave').addEventListener('click', function() {
+			if(creeps.length != 0) return;
+
 			var rect = mouse.getCanvasBounds();
 
 			var colDist = rect.width / cols;
 			var rowDist = rect.height / rows;
 
-			var select = Math.floor(Math.random() * 4);
-			var type;
+			//var select = Math.floor(Math.random() * 4);
+			var type = creepTypes[wave % 4];
 
-			switch(select) {
-			case 0:
-				type = 'normal-creep';
-				break;
-			case 1:
-				type = 'armored-creep';
-				break;
-			case 2:
-				type = 'snake-creep';
-				break;
-			case 3:
-				type = 'air-creep';
-				break;
+			wave++;
+
+			var numToSpawn = Math.ceil(wave / 4);
+
+			for(var i = 0; i < numToSpawn; i++) {
+				creepSpawns.push({type:type, dir:'r', goalDir:'r', x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, time:i * .25});
+				creepSpawns.push({type:type, dir:'d', goalDir:'d', x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, time:0});
 			}
 
 			document.getElementById('towerinfo').innerHTML = "";
 			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
-			creeps.push(objects.CreepFactory({type:type, x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, dir:'r', goalDir:'r'}));
-			creeps.push(objects.CreepFactory({type:type, x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, dir:'d', goalDir:'d'}));
 		});
 
 			//Muting the the audio
@@ -693,6 +706,8 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 		creeps = [];
 		bullets = [];
 		missiles = [];
+
+		creepSpawns = [];
 
 		// initalize tower selection and placement variables
 		towerUnderMouse = undefined;
