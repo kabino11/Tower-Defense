@@ -187,12 +187,12 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 
 				towerSelected = towerUnderMouse;
 				document.getElementById('delete-tower').classList.add('show');
-				var type = towers[towerSelected].type.replace(/-/g, ' ')
-				type = type.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-				document.getElementById('towerinfo').innerHTML = type + "<br />Value: " + towerCosts[towers[towerSelected].type] / 2 + "<br>Range: " + towers[towerSelected].r  + "<br />Damage: " + towers[towerSelected].damage;
+				document.getElementById('upgrade-tower').classList.add('show');
+				towers[towerSelected].showInfo();
 			}
 			else {
 				document.getElementById('delete-tower').classList.remove('show');
+				document.getElementById('upgrade-tower').classList.remove('show');
 				document.getElementById('towerinfo').innerHTML = '';
 			}
 		}
@@ -211,7 +211,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 			var xLoc = Math.floor(mousePos.x / (canvasRect.width / cols));
 			var yLoc = Math.floor(mousePos.y / (canvasRect.height / rows));
 
-			towers.push(objects.TowerFactory({type:typeSelectedBuild, x:xLoc, y:yLoc, r:rangeSelected, dir:'r'}));
+			towers.push(objects.TowerFactory({type:typeSelectedBuild, x:xLoc, y:yLoc, r:rangeSelected, dir:'r', moneyInvested:towerCosts[typeSelectedBuild]}));
 
 			// update pathfinding for creeps
 			blobPath(pathArray, 'r');
@@ -596,6 +596,18 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 			startBuildMode();
 		});
 
+		document.getElementById('upgrade-tower').addEventListener('click', function() {
+			if(towerSelected != undefined && income >= towers[towerSelected].moneyInvested) {
+				income -= towers[towerSelected].moneyInvested;
+				towers[towerSelected].levelUp();
+				towers[towerSelected].showInfo();
+			}
+			else {
+				document.getElementById('towerinfo').innerHTML = "Can't afford that";
+				towerSelected = undefined;
+			}
+		});
+
 		document.getElementById('delete-tower').addEventListener('click', function() {
 			console.log('delete-tower called! ' + towerSelected);
 			if(towerSelected != undefined) {
@@ -605,6 +617,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 				blobPath(pathArrayVertical, 'd');
 				document.getElementById('towerinfo').innerHTML = '';
 				document.getElementById('delete-tower').classList.remove('show');
+				document.getElementById('upgrade-tower').classList.remove('show');
 			}
 		});
 

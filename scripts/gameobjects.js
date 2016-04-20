@@ -16,6 +16,7 @@ Game.gameObjects = (function(mouse) {
 			get shotTimer() { return spec.shotTimer; },
 
 			get level() { return spec.level; },
+			get moneyInvested() { return spec.moneyInvested; },
 			get damage() { return spec.damage; }
 		};
 
@@ -36,6 +37,10 @@ Game.gameObjects = (function(mouse) {
 
 		if(spec.level == undefined) {
 			spec.level = 1;
+		}
+
+		if(spec.moneyInvested == undefined) {
+			spec.moneyInvested = 5;
 		}
 
 		if(spec.damage == undefined) {
@@ -154,6 +159,19 @@ Game.gameObjects = (function(mouse) {
 				spec.dir = 'r';
 			}
 		}
+
+		that.levelUp = function() {
+			spec.level++;
+
+			spec.damage += 5;
+			spec.moneyInvested *= 2;
+		};
+
+		that.showInfo = function() {
+			var type = spec.type.replace(/-/g, ' ')
+			type = type.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+			document.getElementById('towerinfo').innerHTML = type + "<br />Sell Value: " + Math.floor(spec.moneyInvested / 2) + "<br/>Upgrade Cost: " + spec.moneyInvested + "<br>Range: " + spec.r  + "<br />Damage: " + spec.damage;
+		};
 
 		return that;
 	}
