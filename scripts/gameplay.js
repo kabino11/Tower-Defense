@@ -170,14 +170,130 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		var that = Tower(spec);
 
 		if(spec.slowToGive == undefined) {
-			spec.slowToGive = .1;
+			spec.slowToGive = 1;
 		}
 
 		that.shoot = function(targets, xDist, yDist, timePassed) {
 			for(var i = 0; i < targets.length; i++) {
 				if(targets[i].type != 'air-creep') {
-					targets[i].giveSlow(spec.slowToGive);
+					targets[i].giveSlow(spec.slowToGive * timePassed / 1000);
 				}
+			}
+		};
+
+		return that;
+	}
+
+	function AntiAirTower(spec) {
+		var that = Tower(spec);
+
+		spec.damage = 10;
+
+		// same as normal tower, but shoots missiles instead, and it only targets air-creeps
+		that.shoot = function(targets, xDist, yDist, timePassed) {
+			//first we find the centerpoint of our tower
+			var xPos = (spec.x + .5) * xDist,
+				yPos = (spec.y + .5) * yDist;
+
+			//if we're able to fire another shot then try to shoot
+			if(spec.shotTimer <= 0) {
+				//find if there's a creep in front of our gun
+				for(var i = 0; i < targets.length; i++) {
+					if(targets[i].type == 'air-creep') {
+						var cXpos = targets[i].x + targets[i].w / 2;
+						var cYpos = targets[i].y + targets[i].h / 2;
+						var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
+
+						var fireAngle = Math.acos((cXpos - xPos) / dist);
+
+						if(Math.asin((cYpos - yPos) / dist) < 0) {
+							fireAngle = (2 * Math.PI) - fireAngle;
+						}
+
+						// if so shoot at it
+						if(Math.abs(spec.angle - fireAngle) < .3) {
+							spec.shotTimer = spec.timeBetweenShots;
+							missiles.push(Missile({x:xPos, y:yPos, r:10, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+							return;
+						}
+					}
+				}
+			}
+			else {  // otherwise decrement our shot timer
+				spec.shotTimer -= timePassed / 1000;
+			}
+
+			// then if there's nothing to shoot at where we're pointing then find the minion closest to us and rotate likewise
+			var closest = undefined;
+			var closestDist = 99999;
+
+			for(i = 0; i < targets.length; i++) {
+				if(targets[i].type == 'air-creep') {
+					var cxCenter = targets[i].x + targets[i].w / 2;
+					var cyCenter = targets[i].y + targets[i].h / 2;
+					var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
+
+					if(dist < closestDist) {
+						closestDist = dist;
+						closest = targets[i];
+					}
+				}
+			}
+
+			// if there's nothing to shoot at just return
+			if(closest == undefined) {
+				return;
+			}
+
+			// otherwise rotate to closest (in final will rotate by set speet)
+			var cXpos = closest.x + closest.w / 2;
+			var cYpos = closest.y + closest.h / 2;
+
+			var targetAngle = Math.acos((cXpos - xPos) / closestDist);
+
+			if(Math.asin((cYpos - yPos) / closestDist) < 0) {
+				var targetAngle = 2 * Math.PI - targetAngle;
+			}
+
+			spec.angle %= Math.PI * 2;
+
+			var targetVect = {x:Math.cos(targetAngle), y:Math.sin(targetAngle)};
+			var currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)};
+
+			var cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+
+			if(cp > 0) {
+				spec.angle += spec.rotRate * timePassed / 1000;
+				currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)};
+				cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+				if(cp <= 0) {
+					spec.angle = targetAngle;
+				}
+			}
+			else if (cp <= 0) {
+				spec.angle -= spec.rotRate * timePassed / 1000;
+				currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)}
+				cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+				if(cp > 0) {
+					spec.angle = targetAngle;
+				}
+			}
+			spec.angle = spec.angle % (Math.PI * 2);
+
+			if(spec.angle > 0 && spec.angle < Math.PI / 4) {
+				spec.dir = 'r';
+			}
+			else if(spec.angle >= Math.PI / 4 && spec.angle <= Math.PI * 3 / 4) {
+				spec.dir = 'd';
+			}
+			else if (spec.angle > Math.PI * 3 / 4 && spec.angle < Math.PI * 5 / 4) {
+				spec.dir = 'l';
+			}
+			else if (spec.angle >= Math.PI * 5 / 4 && spec.angle <= Math.PI * 7 / 4) {
+				spec.dir = 'u';
+			}
+			else {
+				spec.dir = 'r';
 			}
 		};
 
@@ -192,6 +308,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		}
 		else if(spec.type === 'freeze-tower') {
 			that = FreezeTower(spec);
+		}
+		else if(spec.type === 'anti-air-tower') {
+			that = AntiAirTower(spec);
 		}
 		else {
 			that = Tower(spec);
@@ -417,6 +536,77 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		return that;
 	}
 
+	function Missile(spec) {
+		var that = Bullet(spec);
+
+		var prevUpdate = that.update;
+
+		if(spec.rotRate == undefined) {
+			spec.rotRate = Math.PI;
+		}
+
+		that.update = function(timePassed, targets) {
+			var closest = undefined;
+			var closestDist = 99999;
+
+			for(var i = 0; i < targets.length; i++) {
+				if(targets[i].type == 'air-creep') {
+					var cxCenter = targets[i].x + targets[i].w / 2;
+					var cyCenter = targets[i].y + targets[i].h / 2;
+					var dist = Math.sqrt(Math.pow(cxCenter - spec.x, 2) + Math.pow(cyCenter - spec.y, 2));
+
+					if(dist < closestDist) {
+						closestDist = dist;
+						closest = targets[i];
+					}
+				}
+			}
+
+			// if there's a trackable target near me
+			if(closest != undefined) {
+				// otherwise rotate to closest (in final will rotate by set speet)
+				var cXpos = closest.x + closest.w / 2;
+				var cYpos = closest.y + closest.h / 2;
+
+				var targetAngle = Math.acos((cXpos - spec.x) / closestDist);
+
+				if(Math.asin((cYpos - spec.y) / closestDist) < 0) {
+					var targetAngle = 2 * Math.PI - targetAngle;
+				}
+
+				spec.angle %= Math.PI * 2;
+
+				var targetVect = {x:Math.cos(targetAngle), y:Math.sin(targetAngle)};
+				var currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)};
+
+				var cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+
+				if(cp > 0) {
+					spec.angle += spec.rotRate * timePassed / 1000;
+					currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)};
+					cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+					if(cp <= 0) {
+						spec.angle = targetAngle;
+					}
+				}
+				else if (cp <= 0) {
+					spec.angle -= spec.rotRate * timePassed / 1000;
+					currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)}
+					cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+					if(cp > 0) {
+						spec.angle = targetAngle;
+					}
+				}
+				spec.angle = spec.angle % (Math.PI * 2);	
+			}
+
+			// then call previous update method for actual movement
+			prevUpdate(timePassed);
+		}
+
+		return that;
+	}
+
 	// Define variables for game state
 	// used for input
 	var keyboard = input.Keyboard();
@@ -446,6 +636,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 	var towers;
 	var creeps;
 	var bullets;
+	var missiles;
 
 	// keep track of player data
 	var income;
@@ -837,6 +1028,33 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			}
 		}
 
+		// Now to iterate through all the missiles to update them
+		for(i = missiles.length - 1; i >= 0; i--) {
+			targets = creepTree.retrieve({
+				x:missiles[i].x - missiles[i].r,
+				y:missiles[i].y - missiles[i].r,
+				w:missiles[i].r * 2,
+				h:missiles[i].r * 2
+			});
+			missiles[i].update(timePassed, targets);
+
+			var hit = false;
+			// if we hit someone indicate that we did, deal damage, and then break out because each bullet deals damage once
+			for(j = 0; j < targets.length; j++) {
+				if(targets[j].type == 'air-creep' && collides(targets[j], missiles[i])) {
+					document.getElementById('creep-hit').play();
+					creeps[targets[j].idxNo].giveDamage(missiles[i].dmg);
+					hit = true;
+					break;
+				}
+			}
+
+			// if a missile has hit someone or gone out of canvas delete.
+			if(hit || missiles[i].x + missiles[i].r < 0 || missiles[i].x - missiles[i].r > canvasRect.width || missiles[i].y + missiles[i].r < 0 || missiles[i].y - missiles[i].r > canvasRect.height) {
+				missiles.splice(i, 1);
+			}
+		}
+
 		// Then we'll finally delete creeps from the array when they die
 		for(i = creeps.length - 1; i >= 0; i--) {
 			if(creeps[i].HP <= 0) {
@@ -901,6 +1119,11 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			// now draw all of the bullets
 			for(i = 0; i < bullets.length; i++) {
 				graphics.drawBullet(bullets[i]);
+			}
+
+			// now draw all of the missiles
+			for(i = 0; i < missiles.length; i++) {
+				graphics.drawBullet(missiles[i]);
 			}
 		}
 		else {
@@ -1045,6 +1268,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 		towers = [];
 		creeps = [];
 		bullets = [];
+		missiles = [];
 
 		// initalize tower selection and placement variables
 		towerUnderMouse = undefined;
