@@ -57,21 +57,23 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			if(spec.shotTimer <= 0) {
 				//find if there's a creep in front of our gun
 				for(var i = 0; i < targets.length; i++) {
-					var cXpos = targets[i].x + targets[i].w / 2;
-					var cYpos = targets[i].y + targets[i].h / 2;
-					var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
+					if(targets[i].type != 'air-creep') {
+						var cXpos = targets[i].x + targets[i].w / 2;
+						var cYpos = targets[i].y + targets[i].h / 2;
+						var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
 
-					var fireAngle = Math.acos((cXpos - xPos) / dist);
+						var fireAngle = Math.acos((cXpos - xPos) / dist);
 
-					if(Math.asin((cYpos - yPos) / dist) < 0) {
-						fireAngle = (2 * Math.PI) - fireAngle;
-					}
+						if(Math.asin((cYpos - yPos) / dist) < 0) {
+							fireAngle = (2 * Math.PI) - fireAngle;
+						}
 
-					// if so shoot at it
-					if(Math.abs(spec.angle - fireAngle) < .1) {
-						spec.shotTimer = spec.timeBetweenShots;
-						bullets.push(Bullet({x:xPos, y:yPos, r:5, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
-						return;
+						// if so shoot at it
+						if(Math.abs(spec.angle - fireAngle) < .1) {
+							spec.shotTimer = spec.timeBetweenShots;
+							bullets.push(Bullet({x:xPos, y:yPos, r:5, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+							return;
+						}
 					}
 				}
 			}
@@ -84,13 +86,15 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			var closestDist = 99999;
 
 			for(i = 0; i < targets.length; i++) {
-				var cxCenter = targets[i].x + targets[i].w / 2;
-				var cyCenter = targets[i].y + targets[i].h / 2;
-				var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
+				if(targets[i].type != 'air-creep') {
+					var cxCenter = targets[i].x + targets[i].w / 2;
+					var cyCenter = targets[i].y + targets[i].h / 2;
+					var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
 
-				if(dist < closestDist) {
-					closestDist = dist;
-					closest = targets[i];
+					if(dist < closestDist) {
+						closestDist = dist;
+						closest = targets[i];
+					}
 				}
 			}
 
@@ -782,7 +786,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			var hit = false;
 			// if we hit someone indicate that we did, deal damage, and then break out because each bullet deals damage once
 			for(j = 0; j < targets.length; j++) {
-				if(collides(targets[j], bullets[i])) {
+				if(targets[j].type != 'air-creep' && collides(targets[j], bullets[i])) {
 					document.getElementById('creep-hit').play();
 					creeps[targets[j].idxNo].giveDamage(bullets[i].dmg);
 					hit = true;
@@ -973,7 +977,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			document.getElementById('towerinfo').innerHTML = "";
 			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
 			creeps.push(CreepFactory({type:type, x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, dir:'r', goalDir:'r'}));
-			creeps.push(CreepFactory({type:type, x:0, y:0, w:colDist - 8, h:rowDist - 8, dir:'d', goalDir:'d'}));
+			creeps.push(CreepFactory({type:type, x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, dir:'d', goalDir:'d'}));
 		});
 
 			//Muting the the audio
