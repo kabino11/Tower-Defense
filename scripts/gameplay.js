@@ -546,6 +546,9 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			console.log(rowOut);
 		}
+
+		console.log(pathArray[0].length);
+		console.log(pathArrayVertical.length);
 	}
 
 	// Functions invoked via mouse listeners
@@ -593,7 +596,6 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 			// Decrement from user income
 			income -= towerCosts[typeSelectedBuild];
-			console.log(income);
 
 			// turn off build mode, deselect build option, and remove the event listener for this function
 			build_mode = false;
@@ -971,7 +973,7 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 			document.getElementById('towerinfo').innerHTML = "";
 			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
 			creeps.push(CreepFactory({type:type, x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, dir:'r', goalDir:'r'}));
-			creeps.push(CreepFactory({type:type, x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, dir:'d', goalDir:'d'}));
+			creeps.push(CreepFactory({type:type, x:0, y:0, w:colDist - 8, h:rowDist - 8, dir:'d', goalDir:'d'}));
 		});
 
 			//Muting the the audio
@@ -1034,10 +1036,10 @@ Game.screens['game-play'] = (function(game, graphics, input) {
 
 		//this is the path Array for vertical waves.
 		pathArrayVertical = [];
-		for(var i = 0; i < cols; i++) {
+		for(var i = 0; i < rows; i++) {
 			var row = [];
 
-			for(var j = 0; j < rows; j++) {
+			for(var j = 0; j < cols; j++) {
 				row.push(' ');
 			}
 
