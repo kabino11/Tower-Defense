@@ -7,6 +7,7 @@ Game.screens['settings'] = (function(game) {
 	var rebinding = false;
 
 	function initalize() {
+		// initalize bottom two buttons
 		document.getElementById('settings->main').addEventListener('click', function() {
 			if(!rebinding) {
 				game.showScreen('main-menu');
@@ -17,8 +18,18 @@ Game.screens['settings'] = (function(game) {
 			setToDefault();
 		});
 
-		setToDefault();
+		// attempt to get previous settings
+		var prevRebinds = localStorage.getItem('VWL&AdityaTowerDefense.keysettings');
+		// if there are previous settings then set our keys to them, otherwise set our defaults and save them.
+		if(prevRebinds != null) {
+			keys = JSON.parse(prevRebinds);
+			console.log('The data was loaded!');
+		}
+		else {
+			setToDefault();
+		}
 
+		// set buttons to rebind functions
 		for(var property in keys) {
 			if(keys.hasOwnProperty(property)) {
 				document.getElementById('rebind-' + property).addEventListener('click', rebind);
@@ -27,24 +38,15 @@ Game.screens['settings'] = (function(game) {
 	}
 
 	function run() {
-		var quitKeyOut = document.getElementById('quitKey-out');
-		quitKeyOut.innerHTML = getKeyWindowOutput(keys.quitKey) + ' ';
+		for(var property in keys) {
+			if(keys.hasOwnProperty(property)) {
+				document.getElementById(property + '-out').innerHTML = getKeyWindowOutput(keys[property]);
+			}
+		}
 	}
 
 	function getKeyBinds() {
 		return keys;
-	}
-
-	function rebindQuit() {
-		if(rebinding) {
-			return;
-		}
-		rebinding = true;
-		lastKey = keys.quitKey;
-		keys.quitKey = undefined;
-		var output = document.getElementById('quitKey-out');
-		output.innerHTML = '...';
-		window.addEventListener('keydown', finishRebind);
 	}
 
 	function rebind() {
@@ -110,6 +112,7 @@ Game.screens['settings'] = (function(game) {
 		// then output our message accordingly
 		if(!rebinding) {
 			output.innerHTML = getKeyWindowOutput(changed) + ' ';
+			localStorage['VWL&AdityaTowerDefense.keysettings'] = JSON.stringify(keys);
 			window.removeEventListener('keydown', finishRebind);
 		}
 		else if(!duplicate) {
@@ -125,6 +128,9 @@ Game.screens['settings'] = (function(game) {
 			startWaveKey: KeyEvent.DOM_VK_G,
 			quitKey: KeyEvent.DOM_VK_ESCAPE
 		}
+
+		// save these defaults
+		localStorage['VWL&AdityaTowerDefense.keysettings'] = JSON.stringify(keys);
 
 		for(var property in keys) {
 			if(keys.hasOwnProperty(property)) {
