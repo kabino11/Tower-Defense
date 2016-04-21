@@ -1,4 +1,4 @@
-Game.screens['game-play'] = (function(game, graphics, objects, input, settings) {
+Game.screens['game-play'] = (function(game, graphics, objects, input, settings, highscore) {
 	'use strict';
 
 	// Define variables for game state
@@ -332,7 +332,12 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings) 
 		keyboard.deregisterCommand(startWave);
 		window.cancelAnimationFrame(currentFrame);
 		currentFrame = undefined;
-		game.showScreen('main-menu');
+		if(gameOver) {
+			game.showScreen('high-score');
+		}
+		else {
+			game.showScreen('main-menu');
+		}
 	}
 
 	//core loop: take time, update, render, repeat
@@ -569,6 +574,9 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings) 
 			lives = 0;
 			gameOver = true;
 
+			// add score to high score object
+			highscore.addScore(score);
+
 			for(i = 0; i < towers.length; i++) {
 				for(j = 0; j < 20; j++) {
 					graphics.spawnParticle({x:xDist * (towers[i].x + .5), y:yDist * (towers[i].y + .5)});
@@ -803,4 +811,4 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings) 
 		run: run
 	};
 
-}(Game.game, Game.graphics, Game.gameObjects, Game.input, Game.screens['settings']));
+}(Game.game, Game.graphics, Game.gameObjects, Game.input, Game.screens['settings'], Game.screens['high-score']));

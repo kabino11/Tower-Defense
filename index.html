@@ -12,11 +12,9 @@
 				<img src="textures/logo/logo_brown.png" />
 			</div>
 			<ul>
-				<li> <button id="main->new-game">New&nbsp;Game</button> </li>
-				<li> <button id="main->settings">Settings</button> </li>
-				<li> <button id="main->help">Help</button> </li>
-				<li> <button id="main->about">About</button> </li>
-				<li> <button id="main->credits">Credits</button> </li>
+				<li> <button id="main->new-game">New&nbsp;Game</button> <button id="main->help">Help</button> </li>
+				<li> <button id="main->high-score">High&nbsp;Score</button> <button id="main->about">About</button> </li>
+				<li> <button id="main->settings">Settings</button> <button id="main->credits">Credits</button> </li>
 			</ul>
 		</div>
 		<div id="game-play" class="screen">
@@ -87,6 +85,14 @@
 
 		<!-- <div class="clear"> -->
 		<!-- </div> -->
+		<div id="high-score" class="screen">
+			<h1>High Scores</h1>
+			<ul id="high-score-output"></ul>
+			<ul>
+				<li> <button id="high-score-reset">Reset Scores</button> </li>
+				<li> <button id="high-score->main">Back</button> </li>
+			</ul>
+		</div>
 
 		<div id="settings" class="screen">
 			<p>Settings</p>
@@ -149,6 +155,7 @@
 		<script src="scripts/random.js"></script>
 		<script src="scripts/ParticleSystem.js"></script>
 		<script src="scripts/input.js"></script>
+		<script src="scripts/highscore.js"></script>
 		<script src="scripts/settings.js"></script>
 		<script src="scripts/graphics.js"></script>
 		<script src="scripts/collision.js"></script>
