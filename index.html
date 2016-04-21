@@ -13,6 +13,7 @@
 			</div>
 			<ul>
 				<li> <button id="main->new-game">New&nbsp;Game</button> </li>
+				<li> <button id="main->settings">Settings</button> </li>
 				<li> <button id="main->help">Help</button> </li>
 				<li> <button id="main->about">About</button> </li>
 				<li> <button id="main->credits">Credits</button> </li>
@@ -84,7 +85,19 @@
 			</div>
 		</div>
 
-		<div class="clear">
+		<!-- <div class="clear"> -->
+		<!-- </div> -->
+
+		<div id="settings" class="screen">
+			<p>Settings</p>
+			<ul>
+				<li> Upgrade Tower: <span id="upgradeKey-out"></span>&nbsp;<button id="rebind-upgradeKey">Rebind</button> </li>
+				<li> Sell Tower: <span id="sellKey-out"></span>&nbsp;<button id="rebind-sellKey">Rebind</button> </li>
+				<li> Start Wave: <span id="startWaveKey-out"></span>&nbsp;<button id="rebind-startWaveKey">Rebind</button> </li>
+				<li> Quit: <span id="quitKey-out"></span>&nbsp;<button id="rebind-quitKey">Rebind</button> </li>
+				<li> <button id="set-default">Defaults</button> </li>
+				<li> <button id="settings->main">Back</button> </li>
+			</ul>
 		</div>
 
 		<div id="help" class="screen">
@@ -135,8 +148,9 @@
 		<script src="scripts/game.js"></script>
 		<script src="scripts/random.js"></script>
 		<script src="scripts/ParticleSystem.js"></script>
-		<script src="scripts/graphics.js"></script>
 		<script src="scripts/input.js"></script>
+		<script src="scripts/settings.js"></script>
+		<script src="scripts/graphics.js"></script>
 		<script src="scripts/collision.js"></script>
 		<script src="scripts/quadtree.js"></script>
 		<script src="scripts/gameobjects.js"></script>

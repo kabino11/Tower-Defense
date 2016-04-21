@@ -6,6 +6,10 @@ Game.screens['main-menu'] = (function(game) {
 			game.showScreen('game-play');
 		});
 
+		document.getElementById('main->settings').addEventListener('click', function() {
+			game.showScreen('settings');
+		});
+
 		document.getElementById('main->help').addEventListener('click', function() {
 			game.showScreen('help');
 		});

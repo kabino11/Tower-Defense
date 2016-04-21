@@ -1,4 +1,4 @@
-Game.screens['game-play'] = (function(game, graphics, objects, input) {
+Game.screens['game-play'] = (function(game, graphics, objects, input, settings) {
 	'use strict';
 
 	// Define variables for game state
@@ -19,6 +19,9 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 
 	// keep track of loop state
 	var running = true;
+
+	// to keep track of current delay between presses.
+	var keyPressDelay;
 
 	// timestamp and frame information
 	var prevTime;
@@ -324,6 +327,9 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 
 		running = false;
 		keyboard.deregisterCommand(quitGame);
+		keyboard.deregisterCommand(upgradeTower);
+		keyboard.deregisterCommand(sellTower);
+		keyboard.deregisterCommand(startWave);
 		window.cancelAnimationFrame(currentFrame);
 		currentFrame = undefined;
 		game.showScreen('main-menu');
@@ -333,8 +339,16 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 	function gameLoop() {
 		prevTime = currentTime;
 		currentTime = performance.now();
+		if(keyPressDelay <= 0) {
+			var initiateDelay = keyboard.update(currentTime - prevTime);
+		}
+		else{
+			keyPressDelay -= (currentTime - prevTime) / 1000;
+		}
 
-		keyboard.update(currentTime - prevTime);
+		if(initiateDelay) {
+			keyPressDelay = .5;
+		}
 
 		if(gameOver == false) {
 			update(currentTime - prevTime);
@@ -711,8 +725,13 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 		//Playing background music.
 		document.getElementById('bg-music').play();
 
+		var keys = settings.getKeyBinds();
+
 		// register all our keys
-		keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, quitGame);
+		keyboard.registerCommand(keys.quitKey, quitGame);
+		keyboard.registerCommand(keys.upgradeKey, upgradeTower);
+		keyboard.registerCommand(keys.sellKey, sellTower);
+		keyboard.registerCommand(keys.startWaveKey, startWave);
 
 		window.addEventListener('mousedown', selectTower);
 
@@ -773,6 +792,9 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 		// initalize game running variable and start the loop
 		running = true;
 
+		// set up inital keypress delay (so that only one press will register at a time)
+		keyPressDelay = 0;
+
 		currentFrame = window.requestAnimationFrame(gameLoop);
 	}
 
@@ -781,4 +803,4 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 		run: run
 	};
 
-}(Game.game, Game.graphics, Game.gameObjects, Game.input));
+}(Game.game, Game.graphics, Game.gameObjects, Game.input, Game.screens['settings']));

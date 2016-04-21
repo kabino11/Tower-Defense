@@ -45,11 +45,16 @@ Game.input = (function() {
 		//
 		// ------------------------------------------------------------------
 		that.update = function(elapsedTime) {
+			var keyUsed = false;
+
 			for (handler = 0; handler < that.handlers.length; handler++) {
 				if (that.keys.hasOwnProperty(that.handlers[handler].key)) {
+					keyUsed =  true;
 					that.handlers[handler].handler(elapsedTime);
 				}
 			}
+
+			return keyUsed;
 		};
 		
 		//
