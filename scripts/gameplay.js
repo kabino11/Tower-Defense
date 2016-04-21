@@ -461,7 +461,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 			var hit = false;
 			// if we hit someone indicate that we did, deal damage, and then break out because each bullet deals damage once
 			for(j = 0; j < targets.length; j++) {
-				if(targets[j].type == 'air-creep' && collides(targets[j], missiles[i])) {
+				if((targets[j].type == 'air-creep' || targets[j].type == 'armored-creep') && collides(targets[j], missiles[i])) {
 					document.getElementById('creep-hit').play();
 					creeps[targets[j].idxNo].giveDamage(missiles[i].dmg);
 					hit = true;
@@ -487,9 +487,16 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 			}
 		}
 
+		// determine if we should trigger the game over flag
 		if(lives <= 0) {
 			lives = 0;
 			gameOver = true;
+
+			for(i = 0; i < towers.length; i++) {
+				for(j = 0; j < 20; j++) {
+					graphics.spawnParticle({x:xDist * (towers[i].x + .5), y:yDist * (towers[i].y + .5)});
+				}
+			}
 		}
 	}
 
@@ -666,11 +673,13 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 
 			wave++;
 
+			var hp = 25;
+			hp += 20 * Math.floor(wave / 4);
 			var numToSpawn = Math.ceil(wave / 4);
 
 			for(var i = 0; i < numToSpawn; i++) {
-				creepSpawns.push({type:type, dir:'r', goalDir:'r', x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, time:i * .25});
-				creepSpawns.push({type:type, dir:'d', goalDir:'d', x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, time:0});
+				creepSpawns.push({type:type, dir:'r', goalDir:'r', x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:i * .1});
+				creepSpawns.push({type:type, dir:'d', goalDir:'d', x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:0});
 			}
 
 			document.getElementById('towerinfo').innerHTML = "";
@@ -719,7 +728,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 		cols = 15;
 
 		// initalize income
-		income = 100;
+		income = 20;
 		score = 0;
 		lives = 20;
 		wave = 0;

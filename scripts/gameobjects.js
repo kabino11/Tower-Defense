@@ -230,7 +230,7 @@ Game.gameObjects = (function(mouse) {
 			if(spec.shotTimer <= 0) {
 				//find if there's a creep in front of our gun
 				for(var i = 0; i < targets.length; i++) {
-					if(targets[i].type == 'air-creep') {
+					if(targets[i].type == 'air-creep' || targets[i].type == 'armored-creep') {
 						var cXpos = targets[i].x + targets[i].w / 2;
 						var cYpos = targets[i].y + targets[i].h / 2;
 						var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
@@ -259,7 +259,7 @@ Game.gameObjects = (function(mouse) {
 			var closestDist = 99999;
 
 			for(i = 0; i < targets.length; i++) {
-				if(targets[i].type == 'air-creep') {
+				if(targets[i].type == 'air-creep' || targets[i].type == 'armored-creep') {
 					var cxCenter = targets[i].x + targets[i].w / 2;
 					var cyCenter = targets[i].y + targets[i].h / 2;
 					var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
@@ -504,8 +504,11 @@ Game.gameObjects = (function(mouse) {
 		return that;
 	}
 
+	// Takes half damage, moves slower, and is immune to slow.
 	function ArmoredCreep(spec) {
 		var that = Creep(spec);
+
+		spec.spd = spec.spd * 2 / 3;
 
 		that.giveDamage = function(dmgIn) {
 			spec.HP -= dmgIn / 2;
@@ -514,13 +517,29 @@ Game.gameObjects = (function(mouse) {
 			}
 		}
 
+		// change update method to give immunity to slow
+		var oldUpdate = that.update;
+		that.update = function(timePassed, pathData) {
+			spec.slowTime = 0;
+
+			oldUpdate(timePassed, pathData);
+		} 
+
 		return that;
 	}
 
+	// moves faster, but freezes for longer (cap from normal creep class still applies)
 	function SnakeCreep(spec) {
 		var that = Creep(spec);
 
 		spec.spd = 300;
+
+		var oldGiveSlow = that.giveSlow;
+
+		that.giveSlow = function(time) {
+			time *= 2;
+			oldGiveSlow(time);
+		}
 
 		return that;
 	}
@@ -581,7 +600,7 @@ Game.gameObjects = (function(mouse) {
 			var closestDist = 99999;
 
 			for(var i = 0; i < targets.length; i++) {
-				if(targets[i].type == 'air-creep') {
+				if(targets[i].type == 'air-creep' || targets[i].type == 'armored-creep') {
 					var cxCenter = targets[i].x + targets[i].w / 2;
 					var cyCenter = targets[i].y + targets[i].h / 2;
 					var dist = Math.sqrt(Math.pow(cxCenter - spec.x, 2) + Math.pow(cyCenter - spec.y, 2));
