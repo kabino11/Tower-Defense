@@ -246,7 +246,70 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 		}
 	}
 
-	// functions for keys to invoke
+	// functions for keys/buttons to invoke
+
+	// Starts the wave
+	function startWave() {
+		if(creeps.length != 0) return;
+
+		var rect = mouse.getCanvasBounds();
+
+		var colDist = rect.width / cols;
+		var rowDist = rect.height / rows;
+
+		//var select = Math.floor(Math.random() * 4);
+		var type = creepTypes[wave % 4];
+
+		wave++;
+
+		var hp = 25;
+		hp += 20 * Math.floor(wave / 4);
+		var numToSpawn = Math.ceil(wave / 4);
+
+		for(var i = 0; i < numToSpawn; i++) {
+			creepSpawns.push({type:type, dir:'r', goalDir:'r', x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:i * .1});
+			creepSpawns.push({type:type, dir:'d', goalDir:'d', x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:0});
+		}
+
+		document.getElementById('towerinfo').innerHTML = "";
+		document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
+	}
+
+	// upgrades a turret
+	function upgradeTower() {
+		if(towerSelected != undefined && income >= towers[towerSelected].moneyInvested && towers[towerSelected].level < 3) {
+			income -= towers[towerSelected].moneyInvested;
+			towers[towerSelected].levelUp();
+			towers[towerSelected].showInfo();
+		}
+		else {
+			if(towers[towerSelected].level >= 3) {
+				document.getElementById('towerinfo').innerHTML = "Tower is at MAX level.";
+			}
+			else if(income < towers[towerSelected].moneyInvested) {
+				document.getElementById('towerinfo').innerHTML = "Can't afford that";
+			}
+			else {
+				document.getElementById('towerinfo').innerHTML = "ERROR";
+			}
+			
+			towerSelected = undefined;
+		}
+	}
+
+	function sellTower() {
+		console.log('delete-tower called! ' + towerSelected);
+		if(towerSelected != undefined) {
+			income += Math.floor(towers[towerSelected].moneyInvested / 2);
+			towers.splice(towerSelected, 1);
+			towerSelected = undefined;
+			blobPath(pathArray, 'r');
+			blobPath(pathArrayVertical, 'd');
+			document.getElementById('towerinfo').innerHTML = '';
+			document.getElementById('delete-tower').classList.remove('show');
+			document.getElementById('upgrade-tower').classList.remove('show');
+		}
+	}
 
 	// stops the game loop, deregisters keys, and takes you to the main menu
 	function quitGame() {
@@ -624,80 +687,23 @@ Game.screens['game-play'] = (function(game, graphics, objects, input) {
 			startBuildMode();
 		});
 
-		document.getElementById('upgrade-tower').addEventListener('click', function() {
-			if(towerSelected != undefined && income >= towers[towerSelected].moneyInvested && towers[towerSelected].level < 3) {
-				income -= towers[towerSelected].moneyInvested;
-				towers[towerSelected].levelUp();
-				towers[towerSelected].showInfo();
-			}
-			else {
-				if(towers[towerSelected].level >= 3) {
-					document.getElementById('towerinfo').innerHTML = "Tower is at MAX level.";
-				}
-				else if(income < towers[towerSelected].moneyInvested) {
-					document.getElementById('towerinfo').innerHTML = "Can't afford that";
-				}
-				else {
-					document.getElementById('towerinfo').innerHTML = "ERROR";
-				}
-				
-				towerSelected = undefined;
+		// set up main gameplay buttons
+		document.getElementById('upgrade-tower').addEventListener('click', upgradeTower);	
+		document.getElementById('delete-tower').addEventListener('click', sellTower);
+		document.getElementById('start-wave').addEventListener('click', startWave);
+
+		//Muting the the audio
+		document.getElementById('mute_unmute_button').addEventListener('click', function(){
+			var path = document.getElementById("mute_unmute").src;
+
+			if(path.substring(path.lastIndexOf('/')) === "/unmute.png"){
+				document.getElementById("mute_unmute").src = "textures/mute.png";
+				document.getElementById('bg-music').muted = true;
+			}else{
+				document.getElementById("mute_unmute").src = "textures/unmute.png";
+				document.getElementById('bg-music').muted = false;
 			}
 		});
-
-		document.getElementById('delete-tower').addEventListener('click', function() {
-			console.log('delete-tower called! ' + towerSelected);
-			if(towerSelected != undefined) {
-				income += Math.floor(towers[towerSelected].moneyInvested / 2);
-				towers.splice(towerSelected, 1);
-				towerSelected = undefined;
-				blobPath(pathArray, 'r');
-				blobPath(pathArrayVertical, 'd');
-				document.getElementById('towerinfo').innerHTML = '';
-				document.getElementById('delete-tower').classList.remove('show');
-				document.getElementById('upgrade-tower').classList.remove('show');
-			}
-		});
-
-		// set button to spawn creeps
-		document.getElementById('start-wave').addEventListener('click', function() {
-			if(creeps.length != 0) return;
-
-			var rect = mouse.getCanvasBounds();
-
-			var colDist = rect.width / cols;
-			var rowDist = rect.height / rows;
-
-			//var select = Math.floor(Math.random() * 4);
-			var type = creepTypes[wave % 4];
-
-			wave++;
-
-			var hp = 25;
-			hp += 20 * Math.floor(wave / 4);
-			var numToSpawn = Math.ceil(wave / 4);
-
-			for(var i = 0; i < numToSpawn; i++) {
-				creepSpawns.push({type:type, dir:'r', goalDir:'r', x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:i * .1});
-				creepSpawns.push({type:type, dir:'d', goalDir:'d', x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:0});
-			}
-
-			document.getElementById('towerinfo').innerHTML = "";
-			document.getElementById('gameinfo').innerHTML = "Get Ready...CREEPS coming...!<br />KILL THEM ALL... Go...Go..Go!!!";
-		});
-
-			//Muting the the audio
-			document.getElementById('mute_unmute_button').addEventListener('click', function(){
-				var path = document.getElementById("mute_unmute").src;
-
-				if(path.substring(path.lastIndexOf('/')) === "/unmute.png"){
-					document.getElementById("mute_unmute").src = "textures/mute.png";
-					document.getElementById('bg-music').muted = true;
-				}else{
-					document.getElementById("mute_unmute").src = "textures/unmute.png";
-					document.getElementById('bg-music').muted = false;
-				}
-			});
 	}
 
 	// initalizes game state and starts game loop
