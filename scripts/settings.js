@@ -40,7 +40,7 @@ Game.screens['settings'] = (function(game) {
 	function run() {
 		for(var property in keys) {
 			if(keys.hasOwnProperty(property)) {
-				document.getElementById(property + '-out').innerHTML = getKeyWindowOutput(keys[property]);
+				document.getElementById(property + '-out').innerHTML = getKeyWindowOutput(keys[property]) + ' ';
 			}
 		}
 	}
@@ -65,7 +65,7 @@ Game.screens['settings'] = (function(game) {
 			lastKey = keys[keyId];
 			keys[keyId] = undefined;
 			var output = document.getElementById(keyId + '-out');
-			output.innerHTML = '...';
+			output.innerHTML = '... ';
 			window.addEventListener('keydown', finishRebind);
 		}
 	}

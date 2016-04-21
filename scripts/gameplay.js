@@ -672,7 +672,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings) 
 			typeSelectedBuild = 'freeze-tower';
 			rangeSelected = 3;
 			var temp = objects.TowerFactory({type:typeSelectedBuild, r:rangeSelected})
-			document.getElementById('towerinfo').innerHTML = 'Freeze Tower'+"<br />Cost: " + towerCosts[typeSelectedBuild] + "<br>Range: " + rangeSelected  + "<br />Damage: " + temp.damage;
+			document.getElementById('towerinfo').innerHTML = 'Freeze Tower'+"<br />Cost: " + towerCosts[typeSelectedBuild] + "<br>Range: " + rangeSelected  + "<br />Time slowed per sec: " + temp.slowToGive;
 		});
 
 		document.getElementById('anti-air-tower').addEventListener('mouseover', function() {
