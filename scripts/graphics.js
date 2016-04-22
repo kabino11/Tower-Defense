@@ -265,7 +265,6 @@ Game.graphics = (function() {
 	}
 
 	function drawBullet(spec) {
-
 		context.save();
 
 		var image = new Image();
@@ -273,8 +272,8 @@ Game.graphics = (function() {
 
 		context.translate(spec.x, spec.y);
 		context.rotate(spec.angle);
-
 		context.drawImage(image, 0, 0, 9, 9, -spec.r, -spec.r, spec.r * 2.5, spec.r * 2.5);
+
 		context.restore();
 	}
 
@@ -400,6 +399,34 @@ Game.graphics = (function() {
 		context.restore();
 	}
 
+	function highlightEntrance(spec){
+		var image = new Image();
+		image.src = "textures/entrance.png";
+
+		var xDist = canvas.width / spec.cols;
+		var yDist = canvas.height / spec.rows;
+
+		if(spec.hasOwnProperty('x') && spec.hasOwnProperty('y')) {
+			var squareX = Math.floor(spec.x / xDist);
+			var squareY = Math.floor(spec.y / yDist);
+		}
+
+		if(spec.hasOwnProperty('row') && spec.hasOwnProperty('col')) {
+			squareX = spec.row;
+			squareY = spec.col;
+		}
+
+		var xPos = squareX * xDist + 2;
+		var yPos = squareY * yDist + 2;
+
+		context.save();
+
+		context.drawImage(image, xPos, yPos, xDist - 4, yDist - 4);
+
+		context.restore();
+
+	}
+
 	function drawGameOver() {
 		context.save();
 
@@ -421,10 +448,15 @@ Game.graphics = (function() {
 	}
 
 	function drawMoney(money) {
+		var image = new Image();
+		image.src = "textures/money.png";
+
 		context2.save();
+
+		context2.drawImage(image, 200, 0, 60, 78);
 		context2.font = "30px fantasy";
 	  context2.fillStyle = "#000";
-	  context2.fillText("Money: " + money, 200, 50);
+	  context2.fillText(": $" + money, 265, 50);
 		context2.restore();
 	}
 
@@ -482,6 +514,7 @@ Game.graphics = (function() {
 		drawGrid: drawGrid,
 		highlightSquare: highlightSquare,
 		highlightRange: highlightRange,
+		highlightEntrance:highlightEntrance,
 		drawGameOver: drawGameOver,
 		drawScore: drawScore,
 		drawMoney: drawMoney,
