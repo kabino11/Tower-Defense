@@ -113,7 +113,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 				data[0][i] = 'u';
 			}
 		}
-		
+
 		// then add in towers based on tower coordinates
 		for(i = 0; i < towers.length; i++) {
 			data[towers[i].y][towers[i].x] = 'N';
@@ -309,7 +309,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			else {
 				document.getElementById('towerinfo').innerHTML = "ERROR";
 			}
-			
+
 			towerSelected = undefined;
 		}
 	}
@@ -657,11 +657,11 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			}
 
 			// draw spawn points
-			graphics.highlightSquare({row:creepSpawnLoc.r.x, col:creepSpawnLoc.r.y, rows:rows, cols:cols, validPlace:false});
-			graphics.highlightSquare({row:creepSpawnLoc.d.x, col:creepSpawnLoc.d.y, rows:rows, cols:cols, validPlace:false});
+			graphics.highlightEntrance({row:creepSpawnLoc.r.x, col:creepSpawnLoc.r.y, rows:rows, cols:cols, validPlace:false});
+			graphics.highlightEntrance({row:creepSpawnLoc.d.x, col:creepSpawnLoc.d.y, rows:rows, cols:cols, validPlace:false});
 			if(Math.floor(wave / 4)) {
-				graphics.highlightSquare({row:creepSpawnLoc.u.x, col:creepSpawnLoc.u.y, rows:rows, cols:cols, validPlace:false});
-				graphics.highlightSquare({row:creepSpawnLoc.l.x, col:creepSpawnLoc.l.y, rows:rows, cols:cols, validPlace:false});
+				graphics.highlightEntrance({row:creepSpawnLoc.u.x, col:creepSpawnLoc.u.y, rows:rows, cols:cols, validPlace:false});
+				graphics.highlightEntrance({row:creepSpawnLoc.l.x, col:creepSpawnLoc.l.y, rows:rows, cols:cols, validPlace:false});
 			}
 
 			// now draw the currently placed towers
@@ -756,7 +756,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 		});
 
 		// set up main gameplay buttons
-		document.getElementById('upgrade-tower').addEventListener('click', upgradeTower);	
+		document.getElementById('upgrade-tower').addEventListener('click', upgradeTower);
 		document.getElementById('delete-tower').addEventListener('click', sellTower);
 		document.getElementById('start-wave').addEventListener('click', startWave);
 
@@ -810,7 +810,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 		creepSpawnLoc = {
 			r: { x:0, y: Math.floor(rows / 2) },
 			l: { x:cols - 1, y: Math.floor(rows / 2) },
-			d: { x: Math.floor(cols / 2), y:0 }, 
+			d: { x: Math.floor(cols / 2), y:0 },
 			u: { x: Math.floor(cols / 2), y:rows - 1 }
 		};
 
