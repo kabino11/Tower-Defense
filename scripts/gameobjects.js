@@ -62,23 +62,21 @@ Game.gameObjects = (function(mouse) {
 			if(spec.shotTimer <= 0) {
 				//find if there's a creep in front of our gun
 				for(var i = 0; i < targets.length; i++) {
-					if(targets[i].type != 'air-creep') {
-						var cXpos = targets[i].x + targets[i].w / 2;
-						var cYpos = targets[i].y + targets[i].h / 2;
-						var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
+					var cXpos = targets[i].x + targets[i].w / 2;
+					var cYpos = targets[i].y + targets[i].h / 2;
+					var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
 
-						var fireAngle = Math.acos((cXpos - xPos) / dist);
+					var fireAngle = Math.acos((cXpos - xPos) / dist);
 
-						if(Math.asin((cYpos - yPos) / dist) < 0) {
-							fireAngle = (2 * Math.PI) - fireAngle;
-						}
+					if(Math.asin((cYpos - yPos) / dist) < 0) {
+						fireAngle = (2 * Math.PI) - fireAngle;
+					}
 
-						// if so shoot at it
-						if(Math.abs(spec.angle - fireAngle) < .1) {
-							spec.shotTimer = spec.timeBetweenShots;
-							projectiles.push(Bullet({x:xPos, y:yPos, r:5, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
-							return;
-						}
+					// if so shoot at it
+					if(Math.abs(spec.angle - fireAngle) < .1) {
+						spec.shotTimer = spec.timeBetweenShots;
+						projectiles.push(Bullet({x:xPos, y:yPos, r:5, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+						return;
 					}
 				}
 			}
@@ -91,15 +89,13 @@ Game.gameObjects = (function(mouse) {
 			var closestDist = 99999;
 
 			for(i = 0; i < targets.length; i++) {
-				if(targets[i].type != 'air-creep') {
-					var cxCenter = targets[i].x + targets[i].w / 2;
-					var cyCenter = targets[i].y + targets[i].h / 2;
-					var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
+				var cxCenter = targets[i].x + targets[i].w / 2;
+				var cyCenter = targets[i].y + targets[i].h / 2;
+				var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
 
-					if(dist < closestDist) {
-						closestDist = dist;
-						closest = targets[i];
-					}
+				if(dist < closestDist) {
+					closestDist = dist;
+					closest = targets[i];
 				}
 			}
 
@@ -181,11 +177,27 @@ Game.gameObjects = (function(mouse) {
 
 		spec.damage = 10;
 
+		var oldShoot = that.shoot;
+
+		// make flameTowers stop shooting at air-creeps
+		that.shoot = function(targets, xDist, yDist, timePassed, projectiles) {
+			for(var i = targets.length - 1; i >= 0; i--) {
+				if(targets.type == 'air-creep') {
+					targets.splice(i, 1);
+				}
+			}
+
+			oldShoot(targets, xDist, yDist, timePassed, projectiles);
+		};
+
 		return that;
 	}
 
 	function FreezeTower(spec) {
 		var that = Tower(spec);
+
+		// Define a getter for giving slow
+		Object.defineProperty(that, 'slowToGive', { get: function() { return spec.slowToGive; } });
 
 		if(spec.slowToGive == undefined) {
 			spec.slowToGive = 1;
@@ -259,7 +271,7 @@ Game.gameObjects = (function(mouse) {
 			var closestDist = 99999;
 
 			for(i = 0; i < targets.length; i++) {
-				if(targets[i].type == 'air-creep' || targets[i].type == 'armored-creep') {
+				if(targets[i].type == 'air-creep') {
 					var cxCenter = targets[i].x + targets[i].w / 2;
 					var cyCenter = targets[i].y + targets[i].h / 2;
 					var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
@@ -517,13 +529,10 @@ Game.gameObjects = (function(mouse) {
 			}
 		}
 
-		// change update method to give immunity to slow
-		var oldUpdate = that.update;
-		that.update = function(timePassed, pathData) {
-			spec.slowTime = 0;
-
-			oldUpdate(timePassed, pathData);
-		} 
+		// give immunity to slow
+		that.giveSlow = function() {
+			return;
+		}
 
 		return that;
 	}

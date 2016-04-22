@@ -516,7 +516,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			var hit = false;
 			// if we hit someone indicate that we did, deal damage, and then break out because each bullet deals damage once
 			for(j = 0; j < targets.length; j++) {
-				if(targets[j].type != 'air-creep' && collides(targets[j], bullets[i])) {
+				if(collides(targets[j], bullets[i])) {
 					document.getElementById('creep-hit').play();
 					creeps[targets[j].idxNo].giveDamage(bullets[i].dmg);
 					hit = true;
@@ -543,7 +543,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			var hit = false;
 			// if we hit someone indicate that we did, deal damage, and then break out because each bullet deals damage once
 			for(j = 0; j < targets.length; j++) {
-				if((targets[j].type == 'air-creep' || targets[j].type == 'armored-creep') && collides(targets[j], missiles[i])) {
+				if(targets[j].type == 'air-creep' && collides(targets[j], missiles[i])) {
 					document.getElementById('creep-hit').play();
 					creeps[targets[j].idxNo].giveDamage(missiles[i].dmg);
 					hit = true;
