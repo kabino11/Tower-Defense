@@ -278,6 +278,17 @@ Game.graphics = (function() {
 		context.restore();
 	}
 
+	function drawBomb(spec) {
+		context.save();
+
+		context.beginPath();
+		context.fillStyle = 'red';
+		context.arc(spec.x, spec.y, spec.r, 0, Math.PI * 2);
+		context.fill();
+
+		context.restore();
+	}
+
 	// draws a creep.  (TODO: animated sprites as creeps)
 	function drawCreep(spec) {
 		context.save();
@@ -466,6 +477,7 @@ Game.graphics = (function() {
 		clear: clear,
 		drawTower: drawTower,
 		drawBullet: drawBullet,
+		drawBomb: drawBomb,
 		drawCreep: drawCreep,
 		drawGrid: drawGrid,
 		highlightSquare: highlightSquare,

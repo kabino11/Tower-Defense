@@ -175,19 +175,117 @@ Game.gameObjects = (function(mouse) {
 	function FlameTower(spec) {
 		var that = Tower(spec);
 
-		spec.damage = 10;
+		spec.damage = 8;
+		spec.timeBetweenShots = 1;
 
-		var oldShoot = that.shoot;
+		var oldLevelUp = that.levelUp;
+		that.levelUp = function() {
+			oldLevelUp();
+			spec.damage -= 2;
+		}
 
 		// make flameTowers stop shooting at air-creeps
 		that.shoot = function(targets, xDist, yDist, timePassed, projectiles) {
-			for(var i = targets.length - 1; i >= 0; i--) {
-				if(targets.type == 'air-creep') {
-					targets.splice(i, 1);
+			//first we find the centerpoint of our tower
+			var xPos = (spec.x + .5) * xDist,
+				yPos = (spec.y + .5) * yDist;
+
+			//if we're able to fire another shot then try to shoot
+			if(spec.shotTimer <= 0) {
+				//find if there's a creep in front of our gun
+				for(var i = 0; i < targets.length; i++) {
+					var cXpos = targets[i].x + targets[i].w / 2;
+					var cYpos = targets[i].y + targets[i].h / 2;
+					var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
+
+					var fireAngle = Math.acos((cXpos - xPos) / dist);
+
+					if(Math.asin((cYpos - yPos) / dist) < 0) {
+						fireAngle = (2 * Math.PI) - fireAngle;
+					}
+
+					// if so shoot at it
+					if(Math.abs(spec.angle - fireAngle) < .1) {
+						spec.shotTimer = spec.timeBetweenShots;
+						projectiles.push(Bomb({x:xPos, y:yPos, r:15, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+						return;
+					}
+				}
+			}
+			else {  // otherwise decrement our shot timer
+				spec.shotTimer -= timePassed / 1000;
+			}
+
+			// then if there's nothing to shoot at where we're pointing then find the minion closest to us and rotate likewise
+			var closest = undefined;
+			var closestDist = 99999;
+
+			for(i = 0; i < targets.length; i++) {
+				var cxCenter = targets[i].x + targets[i].w / 2;
+				var cyCenter = targets[i].y + targets[i].h / 2;
+				var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
+
+				if(dist < closestDist) {
+					closestDist = dist;
+					closest = targets[i];
 				}
 			}
 
-			oldShoot(targets, xDist, yDist, timePassed, projectiles);
+			// if there's nothing to shoot at just return
+			if(closest == undefined) {
+				return;
+			}
+
+			// otherwise rotate to closest (in final will rotate by set speet)
+			var cXpos = closest.x + closest.w / 2;
+			var cYpos = closest.y + closest.h / 2;
+
+			var targetAngle = Math.acos((cXpos - xPos) / closestDist);
+
+			if(Math.asin((cYpos - yPos) / closestDist) < 0) {
+				var targetAngle = 2 * Math.PI - targetAngle;
+			}
+
+			spec.angle %= Math.PI * 2;
+
+			var targetVect = {x:Math.cos(targetAngle), y:Math.sin(targetAngle)};
+			var currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)};
+
+			var cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+
+			if(cp > 0) {
+				spec.angle += spec.rotRate * timePassed / 1000;
+				currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)};
+				cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+				if(cp <= 0) {
+					spec.angle = targetAngle;
+				}
+			}
+			else if (cp <= 0) {
+				spec.angle -= spec.rotRate * timePassed / 1000;
+				currentVect = {x:Math.cos(spec.angle), y:Math.sin(spec.angle)}
+				cp = targetVect.y * currentVect.x - targetVect.x * currentVect.y;
+				if(cp > 0) {
+					spec.angle = targetAngle;
+				}
+			}
+			spec.angle = spec.angle % (Math.PI * 2);
+
+			if(spec.angle > 0 && spec.angle < Math.PI / 4) {
+				spec.dir = 'r';
+			}
+			else if(spec.angle >= Math.PI / 4 && spec.angle <= Math.PI * 3 / 4) {
+				spec.dir = 'd';
+			}
+			else if (spec.angle > Math.PI * 3 / 4 && spec.angle < Math.PI * 5 / 4) {
+				spec.dir = 'l';
+			}
+			else if (spec.angle >= Math.PI * 5 / 4 && spec.angle <= Math.PI * 7 / 4) {
+				spec.dir = 'u';
+			}
+			else {
+				spec.dir = 'r';
+			}
 		};
 
 		return that;
@@ -666,6 +764,20 @@ Game.gameObjects = (function(mouse) {
 		return that;
 	}
 
+	function Bomb(spec) {
+		var that = Bullet(spec);
+
+		that.explode = function(targets) {
+			for(var i = 0; i < targets.length; i++) {
+				if(targets[i].type != 'air-creep') {
+					targets[i].giveDamage(spec.dmg);
+				}
+			}
+		};
+
+		return that;
+	}
+
 	return {
 		Tower: Tower,
 		FlameTower: FlameTower,
@@ -678,6 +790,7 @@ Game.gameObjects = (function(mouse) {
 		SnakeCreep: SnakeCreep,
 		CreepFactory: CreepFactory,
 		Bullet: Bullet,
-		Missile: Missile
+		Missile: Missile,
+		Bomb: Bomb
 	};
 }(Game.input.Mouse()));

@@ -37,6 +37,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 	var creeps;
 	var bullets;
 	var missiles;
+	var bombs;
 
 	var creepSpawns;
 
@@ -532,8 +533,11 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			}
 
 			// now have the tower shoot at potential targets
-			if(towers[i].type != 'anti-air-tower') {
+			if(towers[i].type != 'anti-air-tower' && towers[i].type != 'flame-tower') {
 				towers[i].shoot(targets, xDist, yDist, timePassed, bullets);
+			}
+			else if(towers[i].type == 'flame-tower') {
+				towers[i].shoot(targets, xDist, yDist, timePassed, bombs);
 			}
 			else {
 				towers[i].shoot(targets, xDist, yDist, timePassed, missiles);
@@ -592,6 +596,44 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			// if a missile has hit someone or gone out of canvas delete.
 			if(hit || missiles[i].x + missiles[i].r < 0 || missiles[i].x - missiles[i].r > canvasRect.width || missiles[i].y + missiles[i].r < 0 || missiles[i].y - missiles[i].r > canvasRect.height) {
 				missiles.splice(i, 1);
+			}
+		}
+
+		// now iterate through bombs
+		for(i = bombs.length - 1; i >= 0; i--) {
+			bombs[i].update(timePassed);
+			targets = creepTree.retrieve({
+				x:bombs[i].x - bombs[i].r,
+				y:bombs[i].y - bombs[i].r,
+				w:bombs[i].r * 2,
+				h:bombs[i].r * 2
+			});
+
+			var hit = false;
+			for(j = 0; j < targets.length; j++) {
+				// if a bomb hits
+				if(targets[j].type != 'air-creep' && collides(targets[j], bombs[i])) {
+					document.getElementById('creep-hit').play();
+					hit = true;
+					break;
+				}
+			}
+
+			if(hit || bombs[i].traveled > bombs[i].range) {  // if a bomb explodes figure out which minions it affects and explode it on them
+				var explodeArea = {x:bombs[i].x, y:bombs[i].y, r:xDist * 2};
+				var creepsExploded = creepTree.retrieve({  // query creeptree for candidates
+					x:explodeArea.x - explodeArea.r,
+					y:explodeArea.y - explodeArea.r,
+					w:explodeArea.r * 2,
+					h:explodeArea.r * 2
+				});
+				for(var k = creepsExploded.length - 1; k >= 0; k--) {  // now round down those candidate to those we actually hit
+					if(!collides(creepsExploded[k], explodeArea)) {
+						creepsExploded.splice(k, 1);
+					}
+				}
+				bombs[i].explode(creepsExploded);
+				bombs.splice(i, 1);
 			}
 		}
 
@@ -682,6 +724,11 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			// now draw all of the missiles
 			for(i = 0; i < missiles.length; i++) {
 				graphics.drawBullet(missiles[i]);
+			}
+
+			// now draw all of the bombs
+			for(i = 0; i < bombs.length; i++) {
+				graphics.drawBomb(bombs[i]);
 			}
 		}
 		else {
@@ -794,6 +841,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 		creeps = [];
 		bullets = [];
 		missiles = [];
+		bombs = [];
 
 		creepSpawns = [];
 
