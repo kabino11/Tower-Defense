@@ -32,11 +32,6 @@ li {
 	font-size: 45px;
 }
 
-h1 {
-	text-align: center;
-	margin-top: 200px;
-}
-
 .screen {
 	background-image: url("./textures/backgrounds/sand.jpg");
 	background-size: cover;
@@ -119,29 +114,32 @@ h1 {
 }
 
 #high-score h1 {
-	font-size: 75px;
-	margin-top: 80px;
+	font-size: 50px;
 }
 
 #help h1 {
 	font-size: 50px;
-	margin: 80px;
-}
-
-#about h1 {
-	font-size: 50px;
-	margin: 80px;
-}
-
-#settings p {
-	font-size: 50px;
-	margin-left: 50px;
-	text-align: left;
 }
 
 #help p {
 	font-size: 25px;
 }
+
+#about h1 {
+	font-size: 50px;
+}
+
+#about p {
+	font-size: 25px;
+	text-align: justify;
+	margin: 0 8px 0 8px;
+}
+
+#settings h1{
+	font-size: 50px;
+}
+
+
 
 #game-play.screen {
 	background: url("./textures/backgrounds/grass.jpg");
@@ -242,6 +240,13 @@ canvas {
 	border: 5px inset white;
 }
 
+#set-default{
+	margin-right: 25px;
+}
+
+#high-score-reset{
+	margin-right: 25px;
+}
 
 /* * * * * * * * * * * * * * * * * * * * *\
   CSShake :: shake-little

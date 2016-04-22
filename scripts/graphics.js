@@ -280,10 +280,15 @@ Game.graphics = (function() {
 	function drawBomb(spec) {
 		context.save();
 
-		context.beginPath();
-		context.fillStyle = 'red';
-		context.arc(spec.x, spec.y, spec.r, 0, Math.PI * 2);
-		context.fill();
+		var image = new Image();
+		image.src = "textures/bomb.png";
+
+		//context.beginPath();
+		//context.fillStyle = 'red';
+		//context.arc(spec.x, spec.y, spec.r, 0, Math.PI * 2);
+		//context.fill();
+
+		context.drawImage(image, spec.x , spec.y , 40, 40);
 
 		context.restore();
 	}
