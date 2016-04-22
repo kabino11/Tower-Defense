@@ -242,7 +242,7 @@ Game.gameObjects = (function(mouse) {
 			if(spec.shotTimer <= 0) {
 				//find if there's a creep in front of our gun
 				for(var i = 0; i < targets.length; i++) {
-					if(targets[i].type == 'air-creep' || targets[i].type == 'armored-creep') {
+					if(targets[i].type == 'air-creep') {
 						var cXpos = targets[i].x + targets[i].w / 2;
 						var cYpos = targets[i].y + targets[i].h / 2;
 						var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
@@ -411,7 +411,7 @@ Game.gameObjects = (function(mouse) {
 			spec.slowTime = 0;
 		}
 		if(spec.reward == undefined) {
-			spec.reward = 5;
+			spec.reward = 4;
 		}
 		if(spec.score == undefined) {
 			spec.score = 5;

@@ -40,6 +40,8 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 
 	var creepSpawns;
 
+	var creepSpawnLoc;
+
 	// keep track of player data
 	var income;
 	var score;
@@ -57,6 +59,8 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 	// 2d arrays for pathfinding
 	var pathArray;
 	var pathArrayVertical;
+	var pathArrayUp;
+	var pathArrayLeft;
 
 	// variables for enabling build mode as well as turret range and type to build
 	var typeSelectedBuild;
@@ -90,13 +94,23 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 
 		// create objective markers to path to
 		if(dir == 'r') {
-			for(i = 0; i < rows; i++) {
+			for(i = 0; i < data.length; i++) {
 				data[i][data[i].length - 1] = 'r';
 			}
 		}
 		else if(dir == 'd') {
 			for(i = 0; i < data[data.length - 1].length; i++) {
 				data[data.length - 1][i] = 'd';
+			}
+		}
+		else if(dir == 'l') {
+			for(i = 0; i < data.length; i++) {
+				data[i][0] = 'l';
+			}
+		}
+		else if(dir == 'u') {
+			for(i = 0; i < data[0].length; i++) {
+				data[0][i] = 'u';
 			}
 		}
 		
@@ -180,9 +194,6 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 
 			console.log(rowOut);
 		}
-
-		console.log(pathArray[0].length);
-		console.log(pathArrayVertical.length);
 	}
 
 	// Functions invoked via mouse listeners
@@ -191,8 +202,6 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			towerSelected = undefined;
 
 			if(!build_mode && towerUnderMouse != undefined) {
-				console.log("Tower select method called!");
-
 				towerSelected = towerUnderMouse;
 				document.getElementById('delete-tower').classList.add('show');
 				document.getElementById('upgrade-tower').classList.add('show');
@@ -223,8 +232,9 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 
 			// update pathfinding for creeps
 			blobPath(pathArray, 'r');
+			blobPath(pathArrayLeft, 'l');
 			blobPath(pathArrayVertical, 'd');
-			printPaths();
+			blobPath(pathArrayUp, 'u');
 
 			//console.log(typeSelectedBuild + ' tower built');
 
@@ -270,8 +280,12 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 		var numToSpawn = Math.ceil(wave / 4);
 
 		for(var i = 0; i < numToSpawn; i++) {
-			creepSpawns.push({type:type, dir:'r', goalDir:'r', x:0, y:6 * rowDist + 4, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:i * .1});
-			creepSpawns.push({type:type, dir:'d', goalDir:'d', x:6 * colDist + 4, y:0, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:0});
+			creepSpawns.push({type:type, dir:'r', goalDir:'r', x:creepSpawnLoc.r.x * colDist + 4, y:creepSpawnLoc.r.y * rowDist + 4, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:i * .1});
+			creepSpawns.push({type:type, dir:'d', goalDir:'d', x:creepSpawnLoc.d.x * colDist + 4, y:creepSpawnLoc.d.y * rowDist + 4, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:0});
+			if(Math.floor((wave - 1) / 4) > 0) {
+				creepSpawns.push({type:type, dir:'l', goalDir:'l', x:creepSpawnLoc.l.x * colDist + 4, y:creepSpawnLoc.l.y * rowDist + 4, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:0});
+				creepSpawns.push({type:type, dir:'u', goalDir:'u', x:creepSpawnLoc.u.x * colDist + 4, y:creepSpawnLoc.u.y * rowDist + 4, w:colDist - 8, h:rowDist - 8, totalHp:hp, time:0});
+			}
 		}
 
 		document.getElementById('towerinfo').innerHTML = "";
@@ -301,7 +315,6 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 	}
 
 	function sellTower() {
-		console.log('delete-tower called! ' + towerSelected);
 		if(towerSelected != undefined) {
 			income += Math.floor(towers[towerSelected].moneyInvested / 2);
 			towers.splice(towerSelected, 1);
@@ -402,24 +415,43 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 				// create temporary array and fill it to game dimensions
 				var testArray = [];
 				var testArray2 = [];
+				var testArray3 = [];
+				var testArray4 = [];
 
 				for(i = 0; i < rows; i++) {
 					var current = [];
 					var current2 = [];
+					var current3 = [];
+					var current4 = [];
 
 					for(var j = 0; j < cols; j++) {
 						current.push(' ');
 						current2.push(' ');
+						current3.push(' ');
+						current4.push(' ');
 					}
 
 					testArray.push(current);
 					testArray2.push(current2);
+					testArray3.push(current3);
+					testArray4.push(current4);
 				}
 
 				// do pathing with temporary array and proposed coordinates.  Then set validPlace accordingly if there isn't a path
 				blobPath(testArray, 'r', xPos, yPos);
 				blobPath(testArray2, 'd', xPos, yPos);
-				if(testArray[6][0] == ' ' || testArray[6][0] == 'N' || testArray2[0][6] == ' ' || testArray2[0][6] == 'N') {
+				blobPath(testArray3, 'l', xPos, yPos);
+				blobPath(testArray4, 'u', xPos, yPos);
+				if(testArray[creepSpawnLoc.r.y][creepSpawnLoc.r.x] == ' ' || testArray[creepSpawnLoc.r.y][creepSpawnLoc.r.x] == 'N') {
+					validPlace = false;
+				}
+				else if(testArray2[creepSpawnLoc.d.y][creepSpawnLoc.d.x] == ' ' || testArray2[creepSpawnLoc.d.y][creepSpawnLoc.d.x] == 'N') {
+					validPlace = false;
+				}
+				else if(testArray3[creepSpawnLoc.l.y][creepSpawnLoc.l.x] == ' ' || testArray3[creepSpawnLoc.l.y][creepSpawnLoc.l.x] == 'N') {
+					validPlace = false;
+				}
+				else if(testArray4[creepSpawnLoc.u.y][creepSpawnLoc.u.x] == ' ' || testArray4[creepSpawnLoc.u.y][creepSpawnLoc.u.x] == 'N') {
 					validPlace = false;
 				}
 			}
@@ -447,8 +479,14 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			else if(creeps[i].goalDir == 'd') {
 				creeps[i].update(timePassed, pathArrayVertical);
 			}
+			else if(creeps[i].goalDir == 'u') {
+				creeps[i].update(timePassed, pathArrayUp);
+			}
+			else if(creeps[i].goalDir == 'l') {
+				creeps[i].update(timePassed, pathArrayLeft);
+			}
 
-			if(creeps[i].x > canvasRect.width || creeps[i].y > canvasRect.height) {
+			if(creeps[i].x > canvasRect.width || creeps[i].y > canvasRect.height || creeps[i].x < 0 || creeps[i].y < 0) {
 				//console.log('Creep deleted!');
 				creeps.splice(i, 1);
 				lives--;
@@ -618,6 +656,14 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 				graphics.highlightSquare({row:towers[towerSelected].x, col:towers[towerSelected].y, rows:rows, cols:cols, r:towers[towerSelected].r, validPlace:true});
 			}
 
+			// draw spawn points
+			graphics.highlightSquare({row:creepSpawnLoc.r.x, col:creepSpawnLoc.r.y, rows:rows, cols:cols, validPlace:false});
+			graphics.highlightSquare({row:creepSpawnLoc.d.x, col:creepSpawnLoc.d.y, rows:rows, cols:cols, validPlace:false});
+			if(Math.floor(wave / 4)) {
+				graphics.highlightSquare({row:creepSpawnLoc.u.x, col:creepSpawnLoc.u.y, rows:rows, cols:cols, validPlace:false});
+				graphics.highlightSquare({row:creepSpawnLoc.l.x, col:creepSpawnLoc.l.y, rows:rows, cols:cols, validPlace:false});
+			}
+
 			// now draw the currently placed towers
 			for(var i = 0; i < towers.length; i++) {
 				graphics.drawTower({row:towers[i].x, col:towers[i].y, type:towers[i].type, placing:false, dir:towers[i].dir, angle:towers[i].angle, rows:rows, cols:cols});
@@ -760,6 +806,14 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 		rows = 14;
 		cols = 15;
 
+		// set creep spawn locations
+		creepSpawnLoc = {
+			r: { x:0, y: Math.floor(rows / 2) },
+			l: { x:cols - 1, y: Math.floor(rows / 2) },
+			d: { x: Math.floor(cols / 2), y:0 }, 
+			u: { x: Math.floor(cols / 2), y:rows - 1 }
+		};
+
 		// initalize income
 		income = 20;
 		score = 0;
@@ -792,10 +846,34 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			pathArrayVertical.push(row);
 		}
 
+		pathArrayLeft = [];
+		for(var i = 0; i < rows; i++) {
+			var row = [];
+
+			for(var j = 0; j < cols; j++) {
+				row.push(' ');
+			}
+
+			pathArrayLeft.push(row);
+		}
+
+		pathArrayUp = [];
+		for(var i = 0; i < rows; i++) {
+			var row = [];
+
+			for(var j = 0; j < cols; j++) {
+				row.push(' ');
+			}
+
+			pathArrayUp.push(row);
+		}
+
 		//Calling blobPath() for horizontal waves.
 		blobPath(pathArray, 'r');
+		blobPath(pathArrayLeft, 'l');
 		//calling blobPath() for vertical waves.
 		blobPath(pathArrayVertical, 'd');
+		blobPath(pathArrayUp, 'u');
 
 		// initalize game running variable and start the loop
 		running = true;
