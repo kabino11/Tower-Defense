@@ -633,6 +633,11 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 					}
 				}
 				bombs[i].explode(creepsExploded);
+
+				for(k = 0; k < 20; k++) {
+					graphics.spawnParticle(bombs[i]);
+				}
+
 				bombs.splice(i, 1);
 			}
 		}

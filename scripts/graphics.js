@@ -288,7 +288,7 @@ Game.graphics = (function() {
 		//context.arc(spec.x, spec.y, spec.r, 0, Math.PI * 2);
 		//context.fill();
 
-		context.drawImage(image, spec.x , spec.y , 40, 40);
+		context.drawImage(image, spec.x  - spec.r, spec.y  - spec.r, spec.r * 2, spec.r * 2);
 
 		context.restore();
 	}

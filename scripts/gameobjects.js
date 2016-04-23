@@ -207,7 +207,7 @@ Game.gameObjects = (function(mouse) {
 					// if so shoot at it
 					if(Math.abs(spec.angle - fireAngle) < .1) {
 						spec.shotTimer = spec.timeBetweenShots;
-						projectiles.push(Bomb({x:xPos, y:yPos, r:15, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+						projectiles.push(Bomb({x:xPos, y:yPos, r:15, spd:700, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
 						return;
 					}
 				}
