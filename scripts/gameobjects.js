@@ -205,22 +205,24 @@ Game.gameObjects = (function(mouse) {
 			if(spec.shotTimer <= 0) {
 				//find if there's a creep in front of our gun
 				for(var i = 0; i < targets.length; i++) {
-					var cXpos = targets[i].x + targets[i].w / 2;
-					var cYpos = targets[i].y + targets[i].h / 2;
-					var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
+					if(targets[i].type != 'air-creep') {
+						var cXpos = targets[i].x + targets[i].w / 2;
+						var cYpos = targets[i].y + targets[i].h / 2;
+						var dist = Math.sqrt(Math.pow(xPos - cXpos, 2) + Math.pow(yPos - cYpos, 2));
 
-					var fireAngle = Math.acos((cXpos - xPos) / dist);
+						var fireAngle = Math.acos((cXpos - xPos) / dist);
 
-					if(Math.asin((cYpos - yPos) / dist) < 0) {
-						fireAngle = (2 * Math.PI) - fireAngle;
-					}
+						if(Math.asin((cYpos - yPos) / dist) < 0) {
+							fireAngle = (2 * Math.PI) - fireAngle;
+						}
 
-					// if so shoot at it
-					if(Math.abs(spec.angle - fireAngle) < .1) {
-						spec.shotTimer = spec.timeBetweenShots;
-						projectiles.push(Bomb({x:xPos, y:yPos, r:15, spd:700, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
-						spec.hasShot = true;
-						return;
+						// if so shoot at it
+						if(Math.abs(spec.angle - fireAngle) < .1) {
+							spec.shotTimer = spec.timeBetweenShots;
+							projectiles.push(Bomb({x:xPos, y:yPos, r:15, spd:700, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+							spec.hasShot = true;
+							return;
+						}
 					}
 				}
 			}
@@ -233,13 +235,15 @@ Game.gameObjects = (function(mouse) {
 			var closestDist = 99999;
 
 			for(i = 0; i < targets.length; i++) {
-				var cxCenter = targets[i].x + targets[i].w / 2;
-				var cyCenter = targets[i].y + targets[i].h / 2;
-				var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
+				if(targets[i].type != 'air-creep') {
+					var cxCenter = targets[i].x + targets[i].w / 2;
+					var cyCenter = targets[i].y + targets[i].h / 2;
+					var dist = Math.sqrt(Math.pow(cxCenter - xPos, 2) + Math.pow(cyCenter - yPos, 2));
 
-				if(dist < closestDist) {
-					closestDist = dist;
-					closest = targets[i];
+					if(dist < closestDist) {
+						closestDist = dist;
+						closest = targets[i];
+					}
 				}
 			}
 

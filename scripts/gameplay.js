@@ -744,15 +744,13 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			// now draw all of the missiles
 			for(i = 0; i < missiles.length; i++) {
 				graphics.drawBullet(missiles[i]);
+				graphics.spawnParticleInRange(missiles[i], missiles[i].angle - Math.PI / 12, missiles[i].angle + Math.PI / 12);
 			}
 
 			// now draw all of the bombs
 			for(i = 0; i < bombs.length; i++) {
 				graphics.drawBomb(bombs[i]);
-
-				for(var j = 0; j < 3; j++) {
-					graphics.createBombParticleInRange(bombs[i], bombs[i].angle - Math.PI / 6, bombs[i].angle + Math.PI / 6);
-				}
+				graphics.createBombParticleInRange(bombs[i], bombs[i].angle - Math.PI / 12, bombs[i].angle + Math.PI / 12);
 			}
 		}
 		else {

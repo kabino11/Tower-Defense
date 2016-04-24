@@ -205,6 +205,12 @@ Game.graphics = (function() {
 		destructionParticles.create(location);
 	}
 
+	function spawnParticleInRange(location, a, b) {
+		location.direction = Random.nextVectorInAngleRange(a, b);
+
+		destructionParticles.create(location);
+	}
+
 	function createBombParticle(location) {
 		location.direction = Random.nextCircleVector();
 
@@ -570,6 +576,7 @@ Game.graphics = (function() {
 		drawText: drawText,
 		drawImage: drawImage,
 		spawnParticle: spawnParticle,
+		spawnParticleInRange: spawnParticleInRange,
 		createBombParticle: createBombParticle,
 		createBombParticleInRange: createBombParticleInRange,
 		createFreezeParticle: createFreezeParticle,
