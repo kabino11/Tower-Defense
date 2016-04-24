@@ -318,6 +318,19 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 	function sellTower() {
 		if(towerSelected != undefined) {
 			income += Math.floor(towers[towerSelected].moneyInvested / 2);
+
+			var canvasRect = mouse.getCanvasBounds();
+			var xDist = canvasRect.width / cols;
+			var yDist = canvasRect.height / rows;
+
+			var xPos = (towers[towerSelected].x + .5) * xDist;
+			var yPos = (towers[towerSelected].y + .5) * yDist;
+
+			// spawn particles for destroyed tower
+			for(var i = 0; i < 20; i++) {
+				graphics.spawnParticle({x: xPos, y: yPos});
+			}
+
 			towers.splice(towerSelected, 1);
 			towerSelected = undefined;
 			blobPath(pathArray, 'r');

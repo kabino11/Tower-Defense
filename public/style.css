@@ -86,6 +86,11 @@ li {
 	box-shadow: 2px 2px 2px #000;
 }
 
+.screen p {
+  margin-right: 40px;
+  margin-left: 40px;
+}
+
 .button-hidden {
   display: none;
 }
@@ -132,14 +137,11 @@ li {
 #about p {
 	font-size: 25px;
 	text-align: justify;
-	margin: 0 8px 0 8px;
 }
 
 #settings h1{
 	font-size: 50px;
 }
-
-
 
 #game-play.screen {
 	background: url("./textures/backgrounds/grass.jpg");
