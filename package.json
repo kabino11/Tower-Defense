@@ -1,0 +1,25 @@
+{
+  "name": "towerdefense",
+  "version": "1.0.0",
+  "description": "\"Final Project\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kabino11/Tower-Defense.git"
+  },
+  "keywords": [
+    "\"towerdefense\""
+  ],
+  "author": "\"Aditya and Vance\"",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kabino11/Tower-Defense/issues"
+  },
+  "homepage": "https://github.com/kabino11/Tower-Defense#readme",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}
