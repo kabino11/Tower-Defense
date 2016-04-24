@@ -2,7 +2,8 @@ var express = require('express'),
 	http = require('http'),
 	path = require('path'),
 	bodyParser = require("body-parser"),
-	app = express();
+	app = express(),
+	fs = require('fs');
 
 //
 // Define the port to use
@@ -14,13 +15,30 @@ app.use('/scripts', express.static(__dirname + '/scripts'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-var highscores = [
-	{name: 'Name', score:0 },
-	{name: 'Name', score:0 },
-	{name: 'Name', score:0 },
-	{name: 'Name', score:0 },
-	{name: 'Name', score:0 }
-];
+var highscores;
+
+fs.readFile('highscores.json', function read(err, data) {
+	if(err) {
+		highscores = [
+			{name: 'Name', score:0 },
+			{name: 'Name', score:0 },
+			{name: 'Name', score:0 },
+			{name: 'Name', score:0 },
+			{name: 'Name', score:0 }
+		];
+
+		fs.writeFile('highscores.json', JSON.stringify(highscores), function(err) {
+			if(err) {
+				return console.log(err);
+			}
+		});
+	}
+	else {
+		highscores = JSON.parse(data);
+	}
+});
+
+
 
 //
 // Define the different routes we support
@@ -42,6 +60,12 @@ app.post('/addscore', function(request, response) {
 	if(highscores.length > 5) {
 		highscores.splice(5, highscores.length - 5);
 	}
+
+	fs.writeFile('highscores.json', JSON.stringify(highscores), function(err) {
+		if(err) {
+			return console.log(err);
+		}
+	});
 
 	response.end('yes');
 });
