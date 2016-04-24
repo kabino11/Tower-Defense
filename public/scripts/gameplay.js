@@ -661,6 +661,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 				for(j = 0; j < 20; j++) { // spawn death particles
 					graphics.spawnParticle({x:creeps[i].x + creeps[i].w / 2, y:creeps[i].y + creeps[i].h / 2});
 				}
+				graphics.spawnNumberEffect({x:creeps[i].x + creeps[i].w / 2, y:creeps[i].y + creeps[i].h / 2, text:creeps[i].score});
 				income += creeps[i].reward;
 				score += creeps[i].score;
 				creeps.splice(i, 1);

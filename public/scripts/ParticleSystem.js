@@ -1,30 +1,44 @@
+// formal particle object so central game system can manage ALL of the particles
+function Particle(spec, graphics) {
+	var that = {
+		get image() { return spec.image;},
+		get size() { return spec.size;},
+		get center() { return spec.center;},
+		get direction() { return spec.direction;},
+		get speed() { return spec.speed;},
+		get rotation() { return spec.rotation;},
+		get lifetime() { return spec.lifetime;},
+		get alive() { return spec.alive;}
+	};
+
+	that.update = function(timePassed) {
+		spec.alive += timePassed / 1000;
+			
+		//
+		// Update its position
+		spec.center.x += (timePassed / 1000 * spec.speed * spec.direction.x);
+		spec.center.y += (timePassed / 1000 * spec.speed * spec.direction.y);
+		
+		//
+		// Rotate proportional to its speed
+		spec.rotation += spec.speed / 500;
+	};
+
+	that.render = function() {
+		graphics.drawImage(spec);
+	}
+
+	return that;
+}
+
 /*jslint browser: true, white: true, plusplus: true */
 /*global Random */
 function ParticleSystem(spec, graphics) {
 	'use strict';
 	var that = {},
-		activeParticles = 0,
-		particles = [],	// Set of all active particles
 		imageSrc = spec.image;
 
-	//
-	// Replace the spec.image (file to load), with the actual
-	// image that should be rendered.
 	spec.image = new Image();
-	spec.image.onload = function() {
-		//
-		// Replace the render function!  This approach eliminates the need to have a boolean
-		// that we test on every draw call.
-		that.render = function() {
-			var value,
-				particle;
-			
-			for (value = 0; value < particles.length; value++) {
-				particle = particles[value];
-				graphics.drawImage(particle);
-			}
-		};
-	};
 	spec.image.src = imageSrc;
 
 	//------------------------------------------------------------------
@@ -33,6 +47,7 @@ function ParticleSystem(spec, graphics) {
 	//
 	//------------------------------------------------------------------
 	that.create = function(location) {  //use location to specify where you want particles spawned
+		// give the user a chance to specify speed & lifetime from location
 		if(location.speed != undefined) {
 			var speed = location.speed;
 		}
@@ -64,72 +79,9 @@ function ParticleSystem(spec, graphics) {
 		//
 		// Same thing with lifetime
 		p.lifetime = Math.max(0.01, p.lifetime);
-		//
-		// Assign a unique name to each particle
-		particles.push(p);
 
-		activeParticles++;
-	};
-	
-	//------------------------------------------------------------------
-	//
-	// Update the state of all particles.  This includes remove any that 
-	// have exceeded their lifetime.
-	//
-	//------------------------------------------------------------------
-	that.update = function(elapsedTime) {
-		var removeMe = [],
-			value,
-			particle;
-			
-		//
-		// We work with time in seconds, elapsedTime comes in as milliseconds
-		elapsedTime = elapsedTime / 1000;
-		
-		for (value = 0; value < particles.length; value++) {
-			particle = particles[value];
-			//
-			// Update how long it has been alive
-			particle.alive += elapsedTime;
-			
-			//
-			// Update its position
-			particle.center.x += (elapsedTime * particle.speed * particle.direction.x);
-			particle.center.y += (elapsedTime * particle.speed * particle.direction.y);
-			
-			//
-			// Rotate proportional to its speed
-			particle.rotation += particle.speed / 500;
-			
-			//
-			// If the lifetime has expired, identify it for removal
-			if (particle.alive > particle.lifetime) {
-				removeMe.push(value);
-			}
-		}
-
-		//
-		// Remove all of the expired particles
-		for (particle = removeMe.length - 1; particle >= 0; particle--) {
-			activeParticles--;
-			particles.splice(removeMe[particle], 1);
-		}
-		removeMe.length = 0;
-	};
-
-	//clear the particles array (useful for starting a new game after playing previously)
-	that.clear = function() {
-		particles.length = 0;
-	}
-	
-	//------------------------------------------------------------------
-	//
-	// When a particle system is first created, this function is empty.
-	// Once the texture for the particle system is loaded, this function
-	// gets replaced with one that will actually render things.
-	//
-	//------------------------------------------------------------------
-	that.render = function() {
+		// return particle object for actual game system to use
+		return Particle(p, graphics);
 	};
 	
 	return that;

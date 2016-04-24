@@ -1,6 +1,45 @@
 Game.graphics = (function() {
 	'use strict';
 
+	function FloatingNumberEffect(spec) {
+		var that = {
+			get x() { return spec.x; },
+			get y() { return spec.y; },
+			get text() { return spec.text; },
+
+			get lifetime() { return spec.lifetime; },
+			get alive() { return spec.alive; }
+		};
+
+		if(spec.lifetime == undefined) {
+			spec.lifetime = .5;
+		}
+
+		if(spec.alive == undefined) {
+			spec.alive = 0;
+		}
+
+		that.update = function(timePassed) {
+			spec.y -= 100 * timePassed / 1000;
+
+			spec.alive += timePassed / 1000;
+		};
+
+		that.render = function() {
+			context.save();
+
+			context.font = "30px fantasy";
+			context.fillStyle = "#000";
+			context.fillText(spec.text, spec.x, spec.y);
+
+			context.restore();
+		};
+
+		return that;
+	}
+
+	var effects = [];
+
 	//initalize canvas
 	var canvas = document.getElementById('gameplay-canvas'),
 		context = canvas.getContext('2d');
@@ -35,6 +74,16 @@ Game.graphics = (function() {
 	{
 		drawImage: drawImage
 	});
+
+	// Storing images so that they only have to be loaded once
+	var entranceImage = new Image();
+	entranceImage.src = "textures/entrance.png";
+	var bombImage = new Image();
+	bombImage.src = "textures/bomb.png";
+	var bulletImage = new Image();
+	bulletImage.src = "textures/shellshot.png";
+	var moneyImage = new Image();
+	moneyImage.src = "textures/money.png";
 
 	// main object to store sprite sheets
 	var directionalSpriteSheets = {};
@@ -202,31 +251,35 @@ Game.graphics = (function() {
 	function spawnParticle(location) {
 		location.direction = Random.nextCircleVector();
 
-		destructionParticles.create(location);
+		effects.push(destructionParticles.create(location));
 	}
 
 	function spawnParticleInRange(location, a, b) {
 		location.direction = Random.nextVectorInAngleRange(a, b);
 
-		destructionParticles.create(location);
+		effects.push(destructionParticles.create(location));
 	}
 
 	function createBombParticle(location) {
 		location.direction = Random.nextCircleVector();
 
-		bombParticles.create(location);
+		effects.push(bombParticles.create(location));
 	}
 
 	function createBombParticleInRange(location, a, b) {
 		location.direction = Random.nextVectorInAngleRange(a, b);
 
-		bombParticles.create(location);
+		effects.push(bombParticles.create(location));
 	}
 
 	function createFreezeParticle(location) {
 		location.direction = Random.nextCircleVector();
 
-		freezeParticles.create(location);
+		effects.push(freezeParticles.create(location));
+	}
+
+	function spawnNumberEffect(location) {
+		effects.push(FloatingNumberEffect(location));
 	}
 
 	function spawnParticleUp(location) {
@@ -236,23 +289,25 @@ Game.graphics = (function() {
 	}
 
 	function updateParticles(timePassed) {
-		destructionParticles.update(timePassed);
-		bombParticles.update(timePassed);
-		freezeParticles.update(timePassed);
+		for(var i = effects.length - 1; i >= 0; i--) {
+			effects[i].update(timePassed);
+
+			if(effects[i].alive >= effects[i].lifetime) {
+				effects.splice(i, 1);
+			}
+		}
 	}
 
 	// clear particles from system
 	function clearParticles() {
-		destructionParticles.clear();
-		bombParticles.clear();
-		freezeParticles.clear();
+		effects.length = 0;
 	}
 
 	// and now to draw
 	function drawParticles() {
-		destructionParticles.render();
-		bombParticles.render();
-		freezeParticles.render();
+		for(var i = 0; i < effects.length; i++) {
+			effects[i].render();
+		}
 	}
 
 	//create methods to clear canvas
@@ -315,12 +370,9 @@ Game.graphics = (function() {
 	function drawBullet(spec) {
 		context.save();
 
-		var image = new Image();
-		image.src = "textures/shellshot.png";
-
 		context.translate(spec.x, spec.y);
 		context.rotate(spec.angle);
-		context.drawImage(image, 0, 0, 9, 9, -spec.r, -spec.r, spec.r * 2.5, spec.r * 2.5);
+		context.drawImage(bulletImage, 0, 0, 9, 9, -spec.r, -spec.r, spec.r * 2.5, spec.r * 2.5);
 
 		context.restore();
 	}
@@ -328,15 +380,12 @@ Game.graphics = (function() {
 	function drawBomb(spec) {
 		context.save();
 
-		var image = new Image();
-		image.src = "textures/bomb.png";
-
 		//context.beginPath();
 		//context.fillStyle = 'red';
 		//context.arc(spec.x, spec.y, spec.r, 0, Math.PI * 2);
 		//context.fill();
 
-		context.drawImage(image, spec.x  - spec.r, spec.y  - spec.r, spec.r * 2, spec.r * 2);
+		context.drawImage(bombImage, spec.x  - spec.r, spec.y  - spec.r, spec.r * 2, spec.r * 2);
 
 		context.restore();
 	}
@@ -453,9 +502,6 @@ Game.graphics = (function() {
 	}
 
 	function highlightEntrance(spec){
-		var image = new Image();
-		image.src = "textures/entrance.png";
-
 		var xDist = canvas.width / spec.cols;
 		var yDist = canvas.height / spec.rows;
 
@@ -474,7 +520,7 @@ Game.graphics = (function() {
 
 		context.save();
 
-		context.drawImage(image, xPos, yPos, xDist - 4, yDist - 4);
+		context.drawImage(entranceImage, xPos, yPos, xDist - 4, yDist - 4);
 
 		context.restore();
 
@@ -495,37 +541,34 @@ Game.graphics = (function() {
 	function drawScore(score) {
 		context2.save();
 		context2.font = "30px fantasy";
-	  context2.fillStyle = "#000";
-	  context2.fillText("Score: " + score, 5, 50);
+		context2.fillStyle = "#000";
+		context2.fillText("Score: " + score, 5, 50);
 		context2.restore();
 	}
 
 	function drawMoney(money) {
-		var image = new Image();
-		image.src = "textures/money.png";
-
 		context2.save();
 
-		context2.drawImage(image, 200, 0, 60, 78);
+		context2.drawImage(moneyImage, 200, 0, 60, 78);
 		context2.font = "30px fantasy";
-	  context2.fillStyle = "#000";
-	  context2.fillText(": $" + money, 265, 50);
+		context2.fillStyle = "#000";
+		context2.fillText(": $" + money, 265, 50);
 		context2.restore();
 	}
 
 	function drawLives(lives) {
 		context2.save();
 		context2.font = "30px fantasy";
-	  context2.fillStyle = "#000";
-	  context2.fillText("Lives: " + lives, 400, 50);
+		context2.fillStyle = "#000";
+		context2.fillText("Lives: " + lives, 400, 50);
 		context2.restore();
 	}
 
 	function drawWaves(wave) {
 		context2.save();
 		context2.font = "30px fantasy";
-	  context2.fillStyle = "#000";
-	  context2.fillText("Wave: " + wave, 600, 50);
+		context2.fillStyle = "#000";
+		context2.fillText("Wave: " + wave, 600, 50);
 		context2.restore();
 	}
 
@@ -580,6 +623,7 @@ Game.graphics = (function() {
 		createBombParticle: createBombParticle,
 		createBombParticleInRange: createBombParticleInRange,
 		createFreezeParticle: createFreezeParticle,
+		spawnNumberEffect: spawnNumberEffect,
 		spawnParticleUp: spawnParticleUp,
 		clearParticles: clearParticles,
 		updateParticles: updateParticles,
