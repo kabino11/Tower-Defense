@@ -5,7 +5,7 @@ var express = require('express'),
 
 //
 // Define the port to use
-app.set('port', (5000 || 3000);
+app.set('port', (5000 || 3000));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/scripts', express.static(__dirname + '/scripts'));

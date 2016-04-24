@@ -1,7 +1,7 @@
 {
   "name": "towerdefense",
   "version": "1.0.0",
-  "description": "\"Final Project\"",
+  "description": "Final Project for Game Development.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -11,9 +11,9 @@
     "url": "git+https://github.com/kabino11/Tower-Defense.git"
   },
   "keywords": [
-    "\"towerdefense\""
+    "towerdefense"
   ],
-  "author": "\"Aditya and Vance\"",
+  "author": "Aditya Mehra and Vance Larsen",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kabino11/Tower-Defense/issues"
