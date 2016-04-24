@@ -18,6 +18,24 @@ Game.graphics = (function() {
 		}
 	);
 
+	var bombParticles = ParticleSystem( {
+		image: 'textures/explodespark.png',
+		speed: {mean: 240, stdev: .5},
+		lifetime: {mean: .25, stdev: .01}
+	},
+	{
+		drawImage: drawImage
+	});
+
+	var freezeParticles = ParticleSystem( {
+		image: 'textures/freezespark.png',
+		speed: {mean: 180, stdev: .5},
+		lifetime: {mean: 1, stdev: .01}
+	},
+	{
+		drawImage: drawImage
+	});
+
 	// main object to store sprite sheets
 	var directionalSpriteSheets = {};
 	var animatedDirectionalSpriteSheets = {};
@@ -187,6 +205,24 @@ Game.graphics = (function() {
 		destructionParticles.create(location);
 	}
 
+	function createBombParticle(location) {
+		location.direction = Random.nextCircleVector();
+
+		bombParticles.create(location);
+	}
+
+	function createBombParticleInRange(location, a, b) {
+		location.direction = Random.nextVectorInAngleRange(a, b);
+
+		bombParticles.create(location);
+	}
+
+	function createFreezeParticle(location) {
+		location.direction = Random.nextCircleVector();
+
+		freezeParticles.create(location);
+	}
+
 	function spawnParticleUp(location) {
 		location.direction = Random.nextTopQuarterVector();
 
@@ -195,16 +231,22 @@ Game.graphics = (function() {
 
 	function updateParticles(timePassed) {
 		destructionParticles.update(timePassed);
+		bombParticles.update(timePassed);
+		freezeParticles.update(timePassed);
 	}
 
 	// clear particles from system
 	function clearParticles() {
 		destructionParticles.clear();
+		bombParticles.clear();
+		freezeParticles.clear();
 	}
 
 	// and now to draw
 	function drawParticles() {
 		destructionParticles.render();
+		bombParticles.render();
+		freezeParticles.render();
 	}
 
 	//create methods to clear canvas
@@ -288,7 +330,7 @@ Game.graphics = (function() {
 		//context.arc(spec.x, spec.y, spec.r, 0, Math.PI * 2);
 		//context.fill();
 
-		context.drawImage(image, spec.x , spec.y , 40, 40);
+		context.drawImage(image, spec.x  - spec.r, spec.y  - spec.r, spec.r * 2, spec.r * 2);
 
 		context.restore();
 	}
@@ -528,6 +570,9 @@ Game.graphics = (function() {
 		drawText: drawText,
 		drawImage: drawImage,
 		spawnParticle: spawnParticle,
+		createBombParticle: createBombParticle,
+		createBombParticleInRange: createBombParticleInRange,
+		createFreezeParticle: createFreezeParticle,
 		spawnParticleUp: spawnParticleUp,
 		clearParticles: clearParticles,
 		updateParticles: updateParticles,

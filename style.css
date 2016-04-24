@@ -233,7 +233,7 @@ canvas {
 
 #gameplay-canvas{
 	border: 5px inset burlywood;
-	cursor:url(./textures/location_cursor.png), auto;
+	cursor:url(./textures/location_cursor.png) 14 14, auto;
 }
 
 #scoring-canvas{

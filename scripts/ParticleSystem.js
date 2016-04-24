@@ -33,16 +33,30 @@ function ParticleSystem(spec, graphics) {
 	//
 	//------------------------------------------------------------------
 	that.create = function(location) {  //use location to specify where you want particles spawned
+		if(location.speed != undefined) {
+			var speed = location.speed;
+		}
+		else {
+			speed = spec.speed;
+		}
+
+		if(location.lifetime != undefined) {
+			var lifetime = location.lifetime;
+		}
+		else {
+			lifetime = spec.lifetime
+		}
+
 		var p = {
-				image: spec.image,
-				size: Random.nextGaussian(10, 4),
-				center: {x: location.x, y: location.y},
-				direction: location.direction,
-				speed: Math.max(1, Random.nextGaussian(spec.speed.mean, spec.speed.stdev)), // pixels per second
-				rotation: 0,
-				lifetime: Random.nextGaussian(spec.lifetime.mean, spec.lifetime.stdev),	// How long the particle should live, in seconds
-				alive: 0	// How long the particle has been alive, in seconds
-			};
+			image: spec.image,
+			size: Random.nextGaussian(10, 4),
+			center: {x: location.x, y: location.y},
+			direction: location.direction,
+			speed: Math.max(1, Random.nextGaussian(speed.mean, speed.stdev)), // pixels per second
+			rotation: 0,
+			lifetime: Random.nextGaussian(lifetime.mean, lifetime.stdev),	// How long the particle should live, in seconds
+			alive: 0	// How long the particle has been alive, in seconds
+		};
 		
 		//
 		// Ensure we have a valid size - gaussian numbers can be negative

@@ -15,6 +15,8 @@ Game.gameObjects = (function(mouse) {
 			get timeBetweenShots() { return spec.timeBetweenShots; },
 			get shotTimer() { return spec.shotTimer; },
 
+			get hasShot() { return spec.hasShot; },  // keeps track if the tower has fired at anything this frame
+
 			get level() { return spec.level; },
 			get moneyInvested() { return spec.moneyInvested; },
 			get damage() { return spec.damage; }
@@ -33,6 +35,10 @@ Game.gameObjects = (function(mouse) {
 		}
 		if(spec.shotTimer == undefined) {
 			spec.shotTimer = 0;
+		}
+
+		if(spec.hasShot == undefined) {
+			spec.hasShot = false;
 		}
 
 		if(spec.level == undefined) {
@@ -54,6 +60,8 @@ Game.gameObjects = (function(mouse) {
 		};
 
 		that.shoot = function(targets, xDist, yDist, timePassed, projectiles) {
+			spec.hasShot = false;
+
 			//first we find the centerpoint of our tower
 			var xPos = (spec.x + .5) * xDist,
 				yPos = (spec.y + .5) * yDist;
@@ -76,6 +84,7 @@ Game.gameObjects = (function(mouse) {
 					if(Math.abs(spec.angle - fireAngle) < .1) {
 						spec.shotTimer = spec.timeBetweenShots;
 						projectiles.push(Bullet({x:xPos, y:yPos, r:5, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+						spec.hasShot = true;
 						return;
 					}
 				}
@@ -186,6 +195,8 @@ Game.gameObjects = (function(mouse) {
 
 		// make flameTowers stop shooting at air-creeps
 		that.shoot = function(targets, xDist, yDist, timePassed, projectiles) {
+			spec.hasShot = false;
+
 			//first we find the centerpoint of our tower
 			var xPos = (spec.x + .5) * xDist,
 				yPos = (spec.y + .5) * yDist;
@@ -207,7 +218,8 @@ Game.gameObjects = (function(mouse) {
 					// if so shoot at it
 					if(Math.abs(spec.angle - fireAngle) < .1) {
 						spec.shotTimer = spec.timeBetweenShots;
-						projectiles.push(Bomb({x:xPos, y:yPos, r:15, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+						projectiles.push(Bomb({x:xPos, y:yPos, r:15, spd:700, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+						spec.hasShot = true;
 						return;
 					}
 				}
@@ -302,8 +314,11 @@ Game.gameObjects = (function(mouse) {
 		}
 
 		that.shoot = function(targets, xDist, yDist, timePassed) {
+			spec.hasShot = false;
+
 			for(var i = 0; i < targets.length; i++) {
 				if(targets[i].type != 'air-creep') {
+					spec.hasShot = true;
 					targets[i].giveSlow(spec.slowToGive * timePassed / 1000);
 				}
 			}
@@ -332,6 +347,8 @@ Game.gameObjects = (function(mouse) {
 
 		// same as normal tower, but shoots missiles instead, and it only targets air-creeps
 		that.shoot = function(targets, xDist, yDist, timePassed, projectiles) {
+			spec.hasShot = false;
+
 			//first we find the centerpoint of our tower
 			var xPos = (spec.x + .5) * xDist,
 				yPos = (spec.y + .5) * yDist;
@@ -355,6 +372,7 @@ Game.gameObjects = (function(mouse) {
 						if(Math.abs(spec.angle - fireAngle) < .3) {
 							spec.shotTimer = spec.timeBetweenShots;
 							projectiles.push(Missile({x:xPos, y:yPos, r:10, spd:850, range:spec.r * xDist, dmg:spec.damage, angle:spec.angle}));
+							spec.hasShot = true;
 							return;
 						}
 					}

@@ -633,6 +633,11 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 					}
 				}
 				bombs[i].explode(creepsExploded);
+
+				for(k = 0; k < 20; k++) {
+					graphics.createBombParticle(bombs[i]);
+				}
+
 				bombs.splice(i, 1);
 			}
 		}
@@ -673,14 +678,16 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 
 		graphics.clear();
 
+		// draw all of our particles first because it can be hard to see otherwise
+		graphics.drawParticles();
+
 		if(!gameOver) {
 			var mousePos = mouse.getMouse();
+			var canvasRect = mouse.getCanvasBounds();
 
 			// if we're building we want to draw a grid, show a preview sprite of a tower under the mouse cursor, draw a range indicator, and draw a validity indicator
 			if(build_mode) {
 				graphics.drawGrid({rows: rows, cols: cols});
-				var canvasRect = mouse.getCanvasBounds();
-				var mousePos = mouse.getMouse();
 
 				if(mouse.inCanvas()) {
 					graphics.highlightRange({x:mousePos.x, y:mousePos.y, rows:rows, cols:cols, r:rangeSelected});
@@ -709,6 +716,19 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			// now draw the currently placed towers
 			for(var i = 0; i < towers.length; i++) {
 				graphics.drawTower({row:towers[i].x, col:towers[i].y, type:towers[i].type, placing:false, dir:towers[i].dir, angle:towers[i].angle, rows:rows, cols:cols});
+			
+				// draw ice particles if the freeze-tower has fired this frame
+				if(towers[i].hasShot && towers[i].type == 'freeze-tower') {
+					var xDist = canvasRect.width / cols;
+					var yDist = canvasRect.height / rows;
+
+					var xPos = (towers[i].x + .5) * xDist;
+					var yPos = (towers[i].y + .5) * yDist;
+
+					for(var j = 0; j < 5; j++) {
+						graphics.createFreezeParticle({x:xPos, y:yPos});
+					}
+				}
 			}
 
 			// now draw all existing creeps
@@ -729,14 +749,15 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			// now draw all of the bombs
 			for(i = 0; i < bombs.length; i++) {
 				graphics.drawBomb(bombs[i]);
+
+				for(var j = 0; j < 3; j++) {
+					graphics.createBombParticleInRange(bombs[i], bombs[i].angle - Math.PI / 6, bombs[i].angle + Math.PI / 6);
+				}
 			}
 		}
 		else {
 			graphics.drawGameOver();
 		}
-
-		// and then draw all of our particles
-		graphics.drawParticles();
 
 		// and then draw our UI
 		graphics.drawMoney(income);
@@ -762,7 +783,7 @@ Game.screens['game-play'] = (function(game, graphics, objects, input, settings, 
 			if(build_mode) return;
 
 			typeSelectedBuild = 'flame-tower';
-			rangeSelected = 2;
+			rangeSelected = 2.5;
 			var temp = objects.TowerFactory({type:typeSelectedBuild, r:rangeSelected})
 			document.getElementById('towerinfo').innerHTML = 'Flame Tower' + "<br />Cost: " + towerCosts[typeSelectedBuild] + "<br>Range: " + rangeSelected  + "<br />Damage: " + temp.damage;
 		});

@@ -27,6 +27,17 @@ var Random = (function() {
 			y: Math.sin(angle)
 		};
 	}
+
+	function nextVectorInAngleRange(a, b) {
+		var topAngle = Math.max(a, b);
+		var bottomAngle = topAngle == a ? b : a;
+
+		var angle = nextRange(bottomAngle, topAngle);
+		return {
+			x: Math.cos(angle),
+			y: Math.sin(angle)
+		}
+	}
 	
 	//
 	// This is used to give a small performance optimization in generating gaussian random numbers.
@@ -70,6 +81,7 @@ var Random = (function() {
 		nextRange : nextRange,
 		nextCircleVector : nextCircleVector,
 		nextTopQuarterVector: nextTopQuarterVector,
+		nextVectorInAngleRange: nextVectorInAngleRange,
 		nextGaussian : nextGaussian
 	};
 	
